@@ -25,4 +25,21 @@ export const users = mysqlTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
-// TODO: Add your tables here
+/**
+ * Inquiries table for storing customer contact form submissions.
+ * Tracks service inquiries and quotation requests.
+ */
+export const inquiries = mysqlTable("inquiries", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  phone: varchar("phone", { length: 20 }).notNull(),
+  serviceType: varchar("serviceType", { length: 100 }).notNull(),
+  message: text("message"),
+  email: varchar("email", { length: 320 }),
+  status: mysqlEnum("status", ["new", "contacted", "completed", "rejected"]).default("new").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Inquiry = typeof inquiries.$inferSelect;
+export type InsertInquiry = typeof inquiries.$inferInsert;

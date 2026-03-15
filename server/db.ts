@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, inquiries, InsertInquiry } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,4 +89,57 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+export async function createInquiry(inquiry: InsertInquiry) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot create inquiry: database not available");
+    throw new Error("Database not available");
+  }
+
+  try {
+    const result = await db.insert(inquiries).values(inquiry);
+    return result;
+  } catch (error) {
+    console.error("[Database] Failed to create inquiry:", error);
+    throw error;
+  }
+}
+
+export async function getInquiries(limit = 50, offset = 0) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get inquiries: database not available");
+    return [];
+  }
+
+  try {
+    const result = await db
+      .select()
+      .from(inquiries)
+      .orderBy(desc(inquiries.createdAt))
+      .limit(limit)
+      .offset(offset);
+    return result;
+  } catch (error) {
+    console.error("[Database] Failed to get inquiries:", error);
+    return [];
+  }
+}
+
+export async function updateInquiryStatus(id: number, status: string) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot update inquiry: database not available");
+    throw new Error("Database not available");
+  }
+
+  try {
+    await db
+      .update(inquiries)
+      .set({ status: status as any })
+      .where(eq(inquiries.id, id));
+  } catch (error) {
+    console.error("[Database] Failed to update inquiry:", error);
+    throw error;
+  }
+}

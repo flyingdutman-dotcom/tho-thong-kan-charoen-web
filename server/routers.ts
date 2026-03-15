@@ -1,10 +1,12 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, router } from "./_core/trpc";
+import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
+import { z } from "zod";
+import { createInquiry, getInquiries, updateInquiryStatus } from "./db";
+import { notifyOwner } from "./_core/notification";
 
 export const appRouter = router({
-    // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
@@ -17,12 +19,60 @@ export const appRouter = router({
     }),
   }),
 
-  // TODO: add feature routers here, e.g.
-  // todo: router({
-  //   list: protectedProcedure.query(({ ctx }) =>
-  //     db.getUserTodos(ctx.user.id)
-  //   ),
-  // }),
+  inquiries: router({
+    submit: publicProcedure
+      .input(
+        z.object({
+          name: z.string().min(1, "ชื่อจำเป็นต้องระบุ"),
+          phone: z.string().min(9, "เบอร์โทรศัพท์ไม่ถูกต้อง"),
+          serviceType: z.string().min(1, "ประเภทบริการจำเป็นต้องระบุ"),
+          email: z.string().email("อีเมลไม่ถูกต้อง").optional(),
+          message: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        try {
+          const result = await createInquiry({
+            name: input.name,
+            phone: input.phone,
+            serviceType: input.serviceType,
+            email: input.email || null,
+            message: input.message || null,
+          });
+
+          // Notify owner of new inquiry
+          await notifyOwner({
+            title: "ใบขอเสนอราคาใหม่",
+            content: `ได้รับใบขอเสนอราคาจาก ${input.name} (${input.phone}) สำหรับบริการ: ${input.serviceType}`,
+          });
+
+          return { success: true, id: (result as any).insertId || 0 };
+        } catch (error) {
+          console.error("Failed to submit inquiry:", error);
+          throw new Error("ไม่สามารถส่งใบขอเสนอราคาได้ กรุณาลองใหม่");
+        }
+      }),
+    list: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user?.role !== "admin") {
+        throw new Error("Unauthorized");
+      }
+      return await getInquiries();
+    }),
+    updateStatus: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          status: z.enum(["new", "contacted", "completed", "rejected"]),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user?.role !== "admin") {
+          throw new Error("Unauthorized");
+        }
+        await updateInquiryStatus(input.id, input.status);
+        return { success: true };
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;
