@@ -70,12 +70,19 @@ export default function Home() {
               <p className="text-xs text-muted-foreground">บริการลอกท่อระบายน้ำมืออาชีพ</p>
             </div>
           </div>
-          <a href="#contact-form">
-            <Button className="bg-primary hover:bg-primary/90 text-white gap-2">
-              <Phone className="w-4 h-4" />
-              ติดต่อเรา
-            </Button>
-          </a>
+          <div className="flex items-center gap-3">
+            <a href="/admin/login">
+              <Button variant="outline" className="border-2 border-secondary text-secondary hover:bg-secondary/10">
+                แอดมิน
+              </Button>
+            </a>
+            <a href="#contact-form">
+              <Button className="bg-primary hover:bg-primary/90 text-white gap-2">
+                <Phone className="w-4 h-4" />
+                ติดต่อเรา
+              </Button>
+            </a>
+          </div>
         </div>
       </header>
 

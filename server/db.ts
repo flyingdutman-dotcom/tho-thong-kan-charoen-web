@@ -1,6 +1,6 @@
 import { eq, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, inquiries, InsertInquiry, portfolio, InsertPortfolio, reviews, InsertReview, bookings, InsertBooking, Booking } from "../drizzle/schema";
+import { InsertUser, users, inquiries, InsertInquiry, portfolio, InsertPortfolio, reviews, InsertReview, bookings, InsertBooking, Booking, adminUsers, AdminUser, InsertAdminUser } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -381,6 +381,61 @@ export async function deleteBooking(id: number) {
     return true;
   } catch (error) {
     console.error("[Database] Failed to delete booking:", error);
+    throw error;
+  }
+}
+
+
+// Admin Users
+export async function createAdminUser(username: string, hashedPassword: string, email?: string, fullName?: string) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot create admin user: database not available");
+    return null;
+  }
+
+  try {
+    const result = await db.insert(adminUsers).values({
+      username,
+      password: hashedPassword,
+      email: email || null,
+      fullName: fullName || null,
+      isActive: true,
+    });
+    return result;
+  } catch (error) {
+    console.error("[Database] Failed to create admin user:", error);
+    throw error;
+  }
+}
+
+export async function getAdminUserByUsername(username: string) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get admin user: database not available");
+    return undefined;
+  }
+
+  try {
+    const result = await db.select().from(adminUsers).where(eq(adminUsers.username, username)).limit(1);
+    return result.length > 0 ? result[0] : undefined;
+  } catch (error) {
+    console.error("[Database] Failed to get admin user:", error);
+    throw error;
+  }
+}
+
+export async function updateAdminUserLastLogin(id: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot update admin user: database not available");
+    return;
+  }
+
+  try {
+    await db.update(adminUsers).set({ lastLogin: new Date() }).where(eq(adminUsers.id, id));
+  } catch (error) {
+    console.error("[Database] Failed to update admin user last login:", error);
     throw error;
   }
 }

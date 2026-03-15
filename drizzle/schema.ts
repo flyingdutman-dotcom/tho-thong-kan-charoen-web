@@ -99,3 +99,22 @@ export const portfolio = mysqlTable("portfolio", {
 
 export type Portfolio = typeof portfolio.$inferSelect;
 export type InsertPortfolio = typeof portfolio.$inferInsert;
+
+/**
+ * Admin users table for username/password authentication.
+ * Separate from OAuth users for admin-only access.
+ */
+export const adminUsers = mysqlTable("admin_users", {
+  id: int("id").autoincrement().primaryKey(),
+  username: varchar("username", { length: 64 }).notNull().unique(),
+  password: text("password").notNull(),
+  email: varchar("email", { length: 320 }),
+  fullName: text("fullName"),
+  isActive: boolean("isActive").default(true).notNull(),
+  lastLogin: timestamp("lastLogin"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AdminUser = typeof adminUsers.$inferSelect;
+export type InsertAdminUser = typeof adminUsers.$inferInsert;

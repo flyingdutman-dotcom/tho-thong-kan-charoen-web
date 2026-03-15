@@ -15,6 +15,7 @@ import AdminInquiries from "./pages/AdminInquiries";
 import AdminPortfolio from "./pages/AdminPortfolio";
 import AdminReviews from "./pages/AdminReviews";
 import AdminBookings from "./pages/AdminBookings";
+import AdminLogin from "./pages/AdminLogin";
 
 function Router() {
   return (
@@ -30,6 +31,7 @@ function Router() {
       <Route path="/admin/portfolio" component={AdminPortfolio} />
       <Route path="/admin/reviews" component={AdminReviews} />
       <Route path="/admin/bookings" component={AdminBookings} />
+      <Route path="/admin/login" component={AdminLogin} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

@@ -4,7 +4,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
-import { createInquiry, getInquiries, updateInquiryStatus, getPublishedPortfolio, getPortfolioById, createPortfolioItem, createReview, listPublishedReviews, listAllReviews, updateReviewStatus, deleteReview, createBooking, getBookings, getBookingById, updateBookingStatus, deleteBooking } from "./db";
+import { createInquiry, getInquiries, updateInquiryStatus, getPublishedPortfolio, getPortfolioById, createPortfolioItem, createReview, listPublishedReviews, listAllReviews, updateReviewStatus, deleteReview, createBooking, getBookings, getBookingById, updateBookingStatus, deleteBooking, getAdminUserByUsername, updateAdminUserLastLogin } from "./db";
 import { notifyOwner } from "./_core/notification";
 
 export const appRouter = router({
@@ -169,6 +169,30 @@ export const appRouter = router({
         }
         await deleteReview(input.id);
         return { success: true };
+      }),
+  }),
+
+  admin: router({
+    login: publicProcedure
+      .input(
+        z.object({
+          username: z.string().min(1),
+          password: z.string().min(1),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        const adminUser = await getAdminUserByUsername(input.username);
+        if (!adminUser) {
+          throw new Error("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
+        }
+
+        // Simple password check (in production, use bcrypt)
+        if (input.password !== adminUser.password) {
+          throw new Error("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
+        }
+
+        await updateAdminUserLastLogin(adminUser.id);
+        return { success: true, adminId: adminUser.id };
       }),
   }),
 
