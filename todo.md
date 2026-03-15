@@ -65,3 +65,11 @@
 - [x] Create export button in admin inquiries page
 - [x] Include inquiry details in export (name, phone, email, service, status, date)
 - [x] Test export functionality
+
+
+## Admin Account Setup
+- [x] Create admin account setup guide (ADMIN_SETUP.md)
+- [x] Document how to promote user to admin role (promote-admin.mjs script)
+- [x] Create verification guide (ADMIN_VERIFICATION.md)
+- [x] Document admin login and access control
+- [x] Document admin panel features and usage
