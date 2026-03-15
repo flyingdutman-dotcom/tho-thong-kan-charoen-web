@@ -7,6 +7,9 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import Portfolio from "./pages/Portfolio";
 import PortfolioDetails from "./pages/PortfolioDetails";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminInquiries from "./pages/AdminInquiries";
+import AdminPortfolio from "./pages/AdminPortfolio";
 
 function Router() {
   return (
@@ -14,6 +17,9 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/portfolio" component={Portfolio} />
       <Route path="/portfolio/:id" component={PortfolioDetails} />
+      <Route path="/admin" component={AdminDashboard} />
+      <Route path="/admin/inquiries" component={AdminInquiries} />
+      <Route path="/admin/portfolio" component={AdminPortfolio} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
