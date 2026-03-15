@@ -1,6 +1,6 @@
 import { eq, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, inquiries, InsertInquiry } from "../drizzle/schema";
+import { InsertUser, users, inquiries, InsertInquiry, portfolio, InsertPortfolio } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -140,6 +140,64 @@ export async function updateInquiryStatus(id: number, status: string) {
       .where(eq(inquiries.id, id));
   } catch (error) {
     console.error("[Database] Failed to update inquiry:", error);
+    throw error;
+  }
+}
+
+export async function getPublishedPortfolio(limit = 12, offset = 0) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get portfolio: database not available");
+    return [];
+  }
+
+  try {
+    const result = await db
+      .select()
+      .from(portfolio)
+      .where(eq(portfolio.isPublished, "yes"))
+      .orderBy(desc(portfolio.createdAt))
+      .limit(limit)
+      .offset(offset);
+    return result;
+  } catch (error) {
+    console.error("[Database] Failed to get portfolio:", error);
+    return [];
+  }
+}
+
+export async function getPortfolioById(id: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get portfolio item: database not available");
+    return undefined;
+  }
+
+  try {
+    const result = await db
+      .select()
+      .from(portfolio)
+      .where(eq(portfolio.id, id))
+      .limit(1);
+    return result.length > 0 ? result[0] : undefined;
+  } catch (error) {
+    console.error("[Database] Failed to get portfolio item:", error);
+    return undefined;
+  }
+}
+
+export async function createPortfolioItem(item: InsertPortfolio) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot create portfolio item: database not available");
+    throw new Error("Database not available");
+  }
+
+  try {
+    const result = await db.insert(portfolio).values(item);
+    return result;
+  } catch (error) {
+    console.error("[Database] Failed to create portfolio item:", error);
     throw error;
   }
 }

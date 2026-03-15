@@ -3,7 +3,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
-import { createInquiry, getInquiries, updateInquiryStatus } from "./db";
+import { createInquiry, getInquiries, updateInquiryStatus, getPublishedPortfolio, getPortfolioById, createPortfolioItem } from "./db";
 import { notifyOwner } from "./_core/notification";
 
 export const appRouter = router({
@@ -17,6 +17,43 @@ export const appRouter = router({
         success: true,
       } as const;
     }),
+  }),
+
+  portfolio: router({
+    list: publicProcedure.query(async () => {
+      return await getPublishedPortfolio();
+    }),
+    get: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        return await getPortfolioById(input.id);
+      }),
+    create: protectedProcedure
+      .input(
+        z.object({
+          title: z.string().min(1, "ชื่อโครงการจำเป็นต้องระบุ"),
+          description: z.string().optional(),
+          category: z.string().min(1, "หมวดหมู่จำเป็นต้องระบุ"),
+          beforeImage: z.string().optional(),
+          afterImage: z.string().optional(),
+          location: z.string().optional(),
+          completedDate: z.date().optional(),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user?.role !== "admin") {
+          throw new Error("Unauthorized");
+        }
+        return await createPortfolioItem({
+          title: input.title,
+          description: input.description || null,
+          category: input.category,
+          beforeImage: input.beforeImage || null,
+          afterImage: input.afterImage || null,
+          location: input.location || null,
+          completedDate: input.completedDate || null,
+        });
+      }),
   }),
 
   inquiries: router({

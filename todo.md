@@ -30,3 +30,11 @@
 ## Deployment
 - [ ] Create checkpoint before publishing
 - [ ] Publish to Manus platform
+
+## Portfolio Details Page (New Feature)
+- [x] Create portfolio database table with before/after images and descriptions
+- [x] Build portfolio details page component with image gallery
+- [x] Add navigation link to portfolio details from home page
+- [x] Build portfolio listing page
+- [x] Add portfolio tRPC procedures (list, get, create)
+- [x] Test portfolio page responsiveness

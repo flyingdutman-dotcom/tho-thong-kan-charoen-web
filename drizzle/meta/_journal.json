@@ -15,6 +15,13 @@
       "when": 1773547477753,
       "tag": "0001_mixed_proemial_gods",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1773547964069,
+      "tag": "0002_natural_mandarin",
+      "breakpoints": true
     }
   ]
 }

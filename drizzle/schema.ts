@@ -43,3 +43,24 @@ export const inquiries = mysqlTable("inquiries", {
 
 export type Inquiry = typeof inquiries.$inferSelect;
 export type InsertInquiry = typeof inquiries.$inferInsert;
+
+/**
+ * Portfolio table for storing project showcases with before/after images.
+ * Tracks completed projects and their details.
+ */
+export const portfolio = mysqlTable("portfolio", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  category: varchar("category", { length: 100 }).notNull(),
+  beforeImage: varchar("beforeImage", { length: 500 }),
+  afterImage: varchar("afterImage", { length: 500 }),
+  location: varchar("location", { length: 255 }),
+  completedDate: timestamp("completedDate"),
+  isPublished: mysqlEnum("isPublished", ["yes", "no"]).default("yes").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Portfolio = typeof portfolio.$inferSelect;
+export type InsertPortfolio = typeof portfolio.$inferInsert;

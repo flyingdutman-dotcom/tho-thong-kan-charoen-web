@@ -229,7 +229,13 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-secondary mb-4">ผลงานที่ผ่านมา</h2>
-            <p className="text-muted-foreground text-lg">ประสบการณ์การบริการลูกค้าหลากหลายประเภท</p>
+            <p className="text-muted-foreground text-lg mb-6">ประสบการณ์การบริการลูกค้าหลากหลายประเภท</p>
+            <a href="/portfolio">
+              <Button variant="outline" className="border-primary text-primary hover:bg-primary/10 gap-2">
+                ดูผลงานทั้งหมด
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </a>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6 mb-12">
