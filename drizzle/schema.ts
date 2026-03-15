@@ -42,8 +42,26 @@ export const reviews = mysqlTable("reviews", {
 export type Review = typeof reviews.$inferSelect;
 export type InsertReview = typeof reviews.$inferInsert;
 
+export const bookings = mysqlTable("bookings", {
+  id: int("id").autoincrement().primaryKey(),
+  customerName: varchar("customerName", { length: 255 }).notNull(),
+  customerPhone: varchar("customerPhone", { length: 20 }).notNull(),
+  customerEmail: varchar("customerEmail", { length: 320 }),
+  serviceType: varchar("serviceType", { length: 100 }).notNull(),
+  bookingDate: timestamp("bookingDate").notNull(),
+  timeSlot: varchar("timeSlot", { length: 50 }).notNull(), // e.g., "09:00-10:00"
+  location: text("location"),
+  notes: text("notes"),
+  status: mysqlEnum("status", ["pending", "confirmed", "completed", "cancelled"]).default("pending").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Booking = typeof bookings.$inferSelect;
+export type InsertBooking = typeof bookings.$inferInsert;
+
 /**
- * Inquiries table for storing customer contact form submissions.
+ * Stores customer contact form submissions.
  * Tracks service inquiries and quotation requests.
  */
 export const inquiries = mysqlTable("inquiries", {

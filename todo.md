@@ -98,3 +98,16 @@
 - [x] Create dedicated service area page (/service-area)
 - [x] Add map markers for key locations
 - [x] Test maps functionality on different devices
+
+
+## Booking/Calendar System (New Feature)
+- [x] Create bookings database table with date, time, service type, customer info
+- [x] Build calendar component for date/time selection
+- [x] Create booking form page (/booking)
+- [x] Add booking management in admin panel (/admin/bookings)
+- [x] Implement time slot availability system (8 time slots: 08:00-17:00)
+- [x] Add email notification for booking confirmation (via notifyOwner)
+- [x] Add calendar view for admin to see all bookings
+- [x] Implement booking status management (pending, confirmed, completed, cancelled)
+- [x] Add booking deletion feature for admin
+- [x] Test booking functionality

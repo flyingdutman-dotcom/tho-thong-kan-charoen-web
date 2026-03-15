@@ -1,6 +1,6 @@
 import { eq, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, inquiries, InsertInquiry, portfolio, InsertPortfolio, reviews, InsertReview } from "../drizzle/schema";
+import { InsertUser, users, inquiries, InsertInquiry, portfolio, InsertPortfolio, reviews, InsertReview, bookings, InsertBooking, Booking } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -285,6 +285,102 @@ export async function deleteReview(id: number): Promise<void> {
     await db.delete(reviews).where(eq(reviews.id, id));
   } catch (error) {
     console.error("[Database] Failed to delete review:", error);
+    throw error;
+  }
+}
+
+
+export async function createBooking(booking: InsertBooking): Promise<Booking | null> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot create booking: database not available");
+    return null;
+  }
+
+  try {
+    const result = await db.insert(bookings).values(booking);
+    const insertedId = (result as any)[0];
+    
+    if (!insertedId) return null;
+
+    const created = await db.select().from(bookings).where(eq(bookings.id, insertedId)).limit(1);
+    return created.length > 0 ? created[0] : null;
+  } catch (error) {
+    console.error("[Database] Failed to create booking:", error);
+    throw error;
+  }
+}
+
+export async function getBookings(filters?: { status?: string; serviceType?: string }) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get bookings: database not available");
+    return [];
+  }
+
+  try {
+    let query: any = db.select().from(bookings);
+
+    if (filters?.status) {
+      query = query.where(eq(bookings.status, filters.status as any));
+    }
+
+    if (filters?.serviceType) {
+      query = query.where(eq(bookings.serviceType, filters.serviceType));
+    }
+
+    const result = await query.orderBy(desc(bookings.bookingDate));
+    return result;
+  } catch (error) {
+    console.error("[Database] Failed to get bookings:", error);
+    throw error;
+  }
+}
+
+export async function getBookingById(id: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get booking: database not available");
+    return undefined;
+  }
+
+  try {
+    const result: any = await db.select().from(bookings).where(eq(bookings.id, id)).limit(1);
+    return result.length > 0 ? result[0] : undefined;
+  } catch (error) {
+    console.error("[Database] Failed to get booking:", error);
+    throw error;
+  }
+}
+
+export async function updateBookingStatus(id: number, status: string) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot update booking: database not available");
+    return null;
+  }
+
+  try {
+    await db.update(bookings).set({ status: status as any }).where(eq(bookings.id, id));
+    return await getBookingById(id);
+  } catch (error) {
+    console.error("[Database] Failed to update booking:", error);
+    throw error;
+  }
+}
+
+export async function deleteBooking(id: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot delete booking: database not available");
+    return false;
+  }
+
+  try {
+    await db.delete(bookings).where(eq(bookings.id, id));
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to delete booking:", error);
     throw error;
   }
 }

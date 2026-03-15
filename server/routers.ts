@@ -1,9 +1,10 @@
 import { COOKIE_NAME } from "@shared/const";
+import { adminProcedure } from "./_core/trpc";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
-import { createInquiry, getInquiries, updateInquiryStatus, getPublishedPortfolio, getPortfolioById, createPortfolioItem, createReview, listPublishedReviews, listAllReviews, updateReviewStatus, deleteReview } from "./db";
+import { createInquiry, getInquiries, updateInquiryStatus, getPublishedPortfolio, getPortfolioById, createPortfolioItem, createReview, listPublishedReviews, listAllReviews, updateReviewStatus, deleteReview, createBooking, getBookings, getBookingById, updateBookingStatus, deleteBooking } from "./db";
 import { notifyOwner } from "./_core/notification";
 
 export const appRouter = router({
@@ -167,6 +168,67 @@ export const appRouter = router({
           throw new Error("Unauthorized");
         }
         await deleteReview(input.id);
+        return { success: true };
+      }),
+  }),
+
+  bookings: router({
+    create: publicProcedure
+      .input(
+        z.object({
+          customerName: z.string().min(1),
+          customerPhone: z.string().min(9),
+          customerEmail: z.string().email().optional(),
+          serviceType: z.string().min(1),
+          bookingDate: z.date(),
+          timeSlot: z.string().min(1),
+          location: z.string().optional(),
+          notes: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const booking = await createBooking({
+          customerName: input.customerName,
+          customerPhone: input.customerPhone,
+          customerEmail: input.customerEmail || null,
+          serviceType: input.serviceType,
+          bookingDate: input.bookingDate,
+          timeSlot: input.timeSlot,
+          location: input.location || null,
+          notes: input.notes || null,
+          status: "pending",
+        });
+        
+        await notifyOwner({
+          title: "มีการจองบริการใหม่",
+          content: `${input.customerName} ได้จองบริการ ${input.serviceType}`,
+        });
+        
+        return booking;
+      }),
+    list: adminProcedure.query(async () => {
+      return await getBookings();
+    }),
+    get: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        return await getBookingById(input.id);
+      }),
+    updateStatus: adminProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          status: z.enum(["pending", "confirmed", "completed", "cancelled"]),
+        })
+      )
+      .mutation(async ({ input }) => {
+        await updateBookingStatus(input.id, input.status);
+        return { success: true };
+      }),
+    delete: adminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteBooking(input.id);
         return { success: true };
       }),
   }),
