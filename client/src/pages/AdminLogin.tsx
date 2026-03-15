@@ -6,14 +6,21 @@ import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
 import { Lock, User, ArrowLeft } from "lucide-react";
+import { useAdmin } from "@/contexts/AdminContext";
 
 export default function AdminLogin() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [, navigate] = useLocation();
+  const { setAdminSession } = useAdmin();
 
   const login = trpc.admin.login.useMutation({
-    onSuccess: () => {
+    onSuccess: (data) => {
+      setAdminSession({
+        adminId: data.adminId,
+        username: username,
+        loginTime: Date.now(),
+      });
       toast.success("ล็อคอินสำเร็จ!");
       navigate("/admin");
     },

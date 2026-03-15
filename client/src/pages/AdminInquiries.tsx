@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AdminLayout from "@/components/AdminLayout";
+import { useAdmin } from "@/contexts/AdminContext";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -9,6 +11,19 @@ import { toast } from "sonner";
 import { downloadCSV, downloadExcel } from "@/lib/export";
 
 export default function AdminInquiries() {
+  const [, navigate] = useLocation();
+  const { isAdminLoggedIn } = useAdmin();
+
+  useEffect(() => {
+    if (!isAdminLoggedIn) {
+      navigate("/admin/login");
+    }
+  }, [isAdminLoggedIn, navigate]);
+
+  if (!isAdminLoggedIn) {
+    return <div>กำลังเปลี่ยนเส้นทาง...</div>;
+  }
+
   const { data: inquiries, isLoading, refetch } = trpc.inquiries.list.useQuery();
   const updateStatus = trpc.inquiries.updateStatus.useMutation({
     onSuccess: () => {

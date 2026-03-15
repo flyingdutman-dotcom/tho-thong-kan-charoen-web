@@ -4,9 +4,22 @@ import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
 import { Loader2, FileText, Image, TrendingUp, AlertCircle } from "lucide-react";
 import { useLocation } from "wouter";
+import { useAdmin } from "@/contexts/AdminContext";
+import { useEffect } from "react";
 
 export default function AdminDashboard() {
   const [, navigate] = useLocation();
+  const { isAdminLoggedIn } = useAdmin();
+
+  useEffect(() => {
+    if (!isAdminLoggedIn) {
+      navigate("/admin/login");
+    }
+  }, [isAdminLoggedIn, navigate]);
+
+  if (!isAdminLoggedIn) {
+    return <div>กำลังเปลี่ยนเส้นทาง...</div>;
+  }
   const { data: inquiries, isLoading: inquiriesLoading } = trpc.inquiries.list.useQuery();
   const { data: portfolio, isLoading: portfolioLoading } = trpc.portfolio.list.useQuery();
 
