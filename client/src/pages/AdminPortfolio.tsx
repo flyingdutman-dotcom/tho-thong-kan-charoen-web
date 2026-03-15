@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { trpc } from "@/lib/trpc";
 import { Loader2, Plus, Edit2, Trash2, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
+import ImageUpload from "@/components/ImageUpload";
 
 export default function AdminPortfolio() {
   const { data: portfolioItems, isLoading, refetch } = trpc.portfolio.list.useQuery();
@@ -140,37 +141,17 @@ export default function AdminPortfolio() {
               </div>
 
               <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="beforeImage" className="text-secondary font-semibold">
-                    URL รูปภาพก่อน
-                  </Label>
-                  <Input
-                    id="beforeImage"
-                    placeholder="https://..."
-                    value={formData.beforeImage}
-                    onChange={(e) => setFormData({ ...formData, beforeImage: e.target.value })}
-                    className="border-primary/30 focus:border-primary"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    ใช้ manus-upload-file --webdev เพื่ออัปโหลดรูปภาพ
-                  </p>
-                </div>
+              <ImageUpload
+                label="รูปภาพก่อน"
+                value={formData.beforeImage}
+                onImageUrl={(url) => setFormData({ ...formData, beforeImage: url })}
+              />
 
-                <div className="space-y-2">
-                  <Label htmlFor="afterImage" className="text-secondary font-semibold">
-                    URL รูปภาพหลัง
-                  </Label>
-                  <Input
-                    id="afterImage"
-                    placeholder="https://..."
-                    value={formData.afterImage}
-                    onChange={(e) => setFormData({ ...formData, afterImage: e.target.value })}
-                    className="border-primary/30 focus:border-primary"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    ใช้ manus-upload-file --webdev เพื่ออัปโหลดรูปภาพ
-                  </p>
-                </div>
+              <ImageUpload
+                label="รูปภาพหลัง"
+                value={formData.afterImage}
+                onImageUrl={(url) => setFormData({ ...formData, afterImage: url })}
+              />
               </div>
 
               <Button

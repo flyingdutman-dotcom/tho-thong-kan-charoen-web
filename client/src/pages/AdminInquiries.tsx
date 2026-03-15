@@ -4,8 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
-import { Loader2, Trash2, CheckCircle } from "lucide-react";
+import { Loader2, Trash2, CheckCircle, Download } from "lucide-react";
 import { toast } from "sonner";
+import { downloadCSV, downloadExcel } from "@/lib/export";
 
 export default function AdminInquiries() {
   const { data: inquiries, isLoading, refetch } = trpc.inquiries.list.useQuery();
@@ -63,14 +64,14 @@ export default function AdminInquiries() {
           <p className="text-muted-foreground">ดูและจัดการใบขอเสนอราคาจากลูกค้า</p>
         </div>
 
-        {/* Filter */}
+        {/* Filter & Export */}
         <Card>
           <CardHeader>
-            <CardTitle>ตัวกรอง</CardTitle>
+            <CardTitle>ตัวกรองและส่งออก</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex gap-4 items-end">
-              <div className="space-y-2 flex-1">
+            <div className="flex gap-4 items-end flex-wrap">
+              <div className="space-y-2 flex-1 min-w-48">
                 <label className="text-sm font-semibold text-secondary">สถานะ</label>
                 <Select value={selectedStatus} onValueChange={setSelectedStatus}>
                   <SelectTrigger>
@@ -85,6 +86,40 @@ export default function AdminInquiries() {
                   </SelectContent>
                 </Select>
               </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    if (filteredInquiries && filteredInquiries.length > 0) {
+                      downloadCSV(filteredInquiries as any, `inquiries-${new Date().toISOString().split('T')[0]}.csv`);
+                      toast.success("ดาวน์โหลด CSV สำเร็จ");
+                    } else {
+                      toast.error("ไม่มีข้อมูลให้ส่งออก");
+                    }
+                  }}
+                  className="gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  CSV
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    if (filteredInquiries && filteredInquiries.length > 0) {
+                      downloadExcel(filteredInquiries as any, `inquiries-${new Date().toISOString().split('T')[0]}.xlsx`);
+                      toast.success("ดาวน์โหลด Excel สำเร็จ");
+                    } else {
+                      toast.error("ไม่มีข้อมูลให้ส่งออก");
+                    }
+                  }}
+                  className="gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  Excel
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -92,8 +127,12 @@ export default function AdminInquiries() {
         {/* Inquiries Table */}
         <Card>
           <CardHeader>
-            <CardTitle>ใบขอเสนอราคา ({filteredInquiries?.length || 0})</CardTitle>
-            <CardDescription>รายการใบขอเสนอราคาทั้งหมด</CardDescription>
+            <div className="flex justify-between items-start">
+              <div>
+                <CardTitle>ใบขอเสนอราคา ({filteredInquiries?.length || 0})</CardTitle>
+                <CardDescription>รายการใบขอเสนอราคาทั้งหมด</CardDescription>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             {isLoading ? (

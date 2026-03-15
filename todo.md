@@ -49,3 +49,19 @@
 - [x] Build statistics/dashboard overview page
 - [x] Implement role-based access control for admin pages
 - [x] Test admin panel functionality (21 tests passing)
+
+
+## Image Upload Feature (New)
+- [x] Create image upload component for portfolio items
+- [x] Implement S3 upload functionality in backend
+- [x] Add image preview before upload
+- [x] Integrate upload with portfolio management form
+- [x] Add image validation (size, format)
+- [x] Test image upload functionality
+
+## Data Export Feature (New)
+- [x] Create CSV export function for inquiries
+- [x] Add Excel export option for inquiries
+- [x] Create export button in admin inquiries page
+- [x] Include inquiry details in export (name, phone, email, service, status, date)
+- [x] Test export functionality
