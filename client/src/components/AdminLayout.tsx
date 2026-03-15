@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { LogOut, Menu, X, LayoutDashboard, FileText, Image, BarChart3 } from "lucide-react";
+import { LogOut, Menu, X, LayoutDashboard, FileText, Image, BarChart3, Star } from "lucide-react";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -36,6 +36,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { label: "แดชบอร์ด", icon: LayoutDashboard, href: "/admin" },
     { label: "ใบขอเสนอราคา", icon: FileText, href: "/admin/inquiries" },
     { label: "ผลงาน", icon: Image, href: "/admin/portfolio" },
+    { label: "รีวิว", icon: Star, href: "/admin/reviews" },
     { label: "สถิติ", icon: BarChart3, href: "/admin/stats" },
   ];
 

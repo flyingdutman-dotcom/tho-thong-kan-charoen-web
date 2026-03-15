@@ -8,6 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { Phone, MapPin, Facebook, Instagram, Wrench, CheckCircle, Award, ArrowRight } from "lucide-react";
+import ReviewsSection from "@/components/ReviewsSection";
+import CompanyMap from "@/components/CompanyMap";
 
 export default function Home() {
   const [formData, setFormData] = useState({
@@ -294,6 +296,9 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Reviews Section */}
+      <ReviewsSection />
+
       {/* Inquiry Form Section */}
       <section id="contact-form" className="py-16 bg-white">
         <div className="container mx-auto px-4 max-w-2xl">
@@ -395,6 +400,17 @@ export default function Home() {
               </form>
             </CardContent>
           </Card>
+        </div>
+      </section>
+
+      {/* Map Section */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-secondary mb-4">พบเราได้ที่</h2>
+            <p className="text-muted-foreground text-lg">ตำแหน่งที่ตั้งบริษัทและพื้นที่บริการ</p>
+          </div>
+          <CompanyMap />
         </div>
       </section>
 

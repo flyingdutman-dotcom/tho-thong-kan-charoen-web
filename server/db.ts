@@ -1,6 +1,6 @@
 import { eq, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, inquiries, InsertInquiry, portfolio, InsertPortfolio } from "../drizzle/schema";
+import { InsertUser, users, inquiries, InsertInquiry, portfolio, InsertPortfolio, reviews, InsertReview } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -198,6 +198,93 @@ export async function createPortfolioItem(item: InsertPortfolio) {
     return result;
   } catch (error) {
     console.error("[Database] Failed to create portfolio item:", error);
+    throw error;
+  }
+}
+
+
+// Review functions
+export async function createReview(review: InsertReview): Promise<void> {
+  if (!review.customerName) {
+    throw new Error("Customer name is required");
+  }
+
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot create review: database not available");
+    return;
+  }
+
+  try {
+    await db.insert(reviews).values(review);
+  } catch (error) {
+    console.error("[Database] Failed to create review:", error);
+    throw error;
+  }
+}
+
+export async function listPublishedReviews() {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot list reviews: database not available");
+    return [];
+  }
+
+  try {
+    const result = await db
+      .select()
+      .from(reviews)
+      .where(eq(reviews.isPublished, true))
+      .orderBy(desc(reviews.createdAt));
+    return result;
+  } catch (error) {
+    console.error("[Database] Failed to list reviews:", error);
+    throw error;
+  }
+}
+
+export async function listAllReviews() {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot list reviews: database not available");
+    return [];
+  }
+
+  try {
+    const result = await db.select().from(reviews).orderBy(desc(reviews.createdAt));
+    return result;
+  } catch (error) {
+    console.error("[Database] Failed to list reviews:", error);
+    throw error;
+  }
+}
+
+export async function updateReviewStatus(id: number, isPublished: boolean): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot update review: database not available");
+    return;
+  }
+
+  try {
+    await db.update(reviews).set({ isPublished }).where(eq(reviews.id, id));
+  } catch (error) {
+    console.error("[Database] Failed to update review:", error);
+    throw error;
+  }
+}
+
+export async function deleteReview(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot delete review: database not available");
+    return;
+  }
+
+  try {
+    await db.delete(reviews).where(eq(reviews.id, id));
+  } catch (error) {
+    console.error("[Database] Failed to delete review:", error);
     throw error;
   }
 }
