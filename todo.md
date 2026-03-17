@@ -179,3 +179,11 @@
 - [x] Updated AdminBookings to use listAdmin, updateStatusAdmin, deleteAdmin
 - [x] All admin pages now accessible with username/password login
 - [x] All 24 vitest tests passing
+
+
+## AdminLayout Access Control Fix (Bug Fix)
+- [x] Updated AdminLayout to use AdminContext instead of Manus OAuth
+- [x] Fixed role check to accept both admin login and Manus OAuth
+- [x] Display admin username from AdminContext session
+- [x] Support logout for both authentication methods
+- [x] All 24 vitest tests passing

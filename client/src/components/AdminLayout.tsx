@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { useAdmin } from "@/contexts/AdminContext";
 import { LogOut, Menu, X, LayoutDashboard, FileText, Image, BarChart3, Star, Calendar } from "lucide-react";
 
 interface AdminLayoutProps {
@@ -12,13 +13,23 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [, navigate] = useLocation();
   const { user, logout } = useAuth();
+  const { isAdminLoggedIn, adminSession, logout: adminLogout } = useAdmin();
 
   const handleLogout = async () => {
-    await logout();
+    if (isAdminLoggedIn) {
+      adminLogout();
+    } else {
+      await logout();
+    }
     navigate("/");
   };
 
-  if (user?.role !== "admin") {
+  // Check if user is logged in via admin login or Manus OAuth
+  const isAdmin = isAdminLoggedIn || user?.role === "admin";
+  const adminName = adminSession?.username || user?.name || "Admin";
+  const adminEmail = user?.email || "";
+
+  if (!isAdmin) {
     return (
       <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
         <div className="text-center">
@@ -78,8 +89,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         <div className="p-4 border-t border-white/20 space-y-2">
           {sidebarOpen && (
             <div className="text-sm text-white/80 px-2">
-              <p className="font-semibold">{user?.name}</p>
-              <p className="text-xs text-white/60">{user?.email}</p>
+              <p className="font-semibold">{adminName}</p>
+              <p className="text-xs text-white/60">{adminEmail}</p>
             </div>
           )}
           <Button
@@ -112,7 +123,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-secondary">บริษัท ท่อทองการเจริญ - ระบบแอดมิน</h1>
             <div className="flex items-center gap-4">
-              <span className="text-sm text-muted-foreground">ยินดีต้อนรับ, {user?.name}</span>
+              <span className="text-sm text-muted-foreground">ยินดีต้อนรับ, {adminName}</span>
             </div>
           </div>
         </div>
