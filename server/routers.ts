@@ -4,7 +4,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
-import { createInquiry, getInquiries, updateInquiryStatus, getPublishedPortfolio, getPortfolioById, createPortfolioItem, createReview, listPublishedReviews, listAllReviews, updateReviewStatus, deleteReview, createBooking, getBookings, getBookingById, updateBookingStatus, deleteBooking, getAdminUserByUsername, updateAdminUserLastLogin } from "./db";
+import { createInquiry, getInquiries, updateInquiryStatus, getPublishedPortfolio, getPortfolioById, createPortfolioItem, createReview, listPublishedReviews, listAllReviews, updateReviewStatus, deleteReview, createBooking, getBookings, getBookingById, updateBookingStatus, deleteBooking, getAdminUserByUsername, updateAdminUserLastLogin, verifyPassword, hashPassword, createFAQ, getFAQs, getAllFAQs, updateFAQ, deleteFAQ } from "./db";
 import { notifyOwner } from "./_core/notification";
 
 export const appRouter = router({
@@ -186,8 +186,9 @@ export const appRouter = router({
           throw new Error("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
         }
 
-        // Simple password check (in production, use bcrypt)
-        if (input.password !== adminUser.password) {
+        // Verify password with bcrypt
+        const isPasswordValid = await verifyPassword(input.password, adminUser.password);
+        if (!isPasswordValid) {
           throw new Error("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
         }
 
@@ -253,6 +254,49 @@ export const appRouter = router({
       .input(z.object({ id: z.number() }))
       .mutation(async ({ input }) => {
         await deleteBooking(input.id);
+        return { success: true };
+      }),
+  }),
+
+  faqs: router({
+    list: publicProcedure
+      .input(z.object({ category: z.string().optional() }).optional())
+      .query(async ({ input }) => {
+        return await getFAQs(input?.category);
+      }),
+    all: adminProcedure.query(async () => {
+      return await getAllFAQs();
+    }),
+    create: adminProcedure
+      .input(
+        z.object({
+          question: z.string().min(1),
+          answer: z.string().min(1),
+          category: z.string().min(1),
+          order: z.number().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        return await createFAQ(input.question, input.answer, input.category, input.order);
+      }),
+    update: adminProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          question: z.string().optional(),
+          answer: z.string().optional(),
+          category: z.string().optional(),
+          order: z.number().optional(),
+          isPublished: z.boolean().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        return await updateFAQ(input.id, input.question, input.answer, input.category, input.order, input.isPublished);
+      }),
+    delete: adminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteFAQ(input.id);
         return { success: true };
       }),
   }),

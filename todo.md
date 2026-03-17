@@ -132,3 +132,30 @@
 - [x] Fix AdminBookings to check admin login session (remaining)
 - [x] Add redirect to login page if not authenticated
 - [x] Test admin access with username/password login
+
+
+## Password Encryption with bcrypt (New Feature)
+- [x] Install bcrypt package
+- [x] Update admin login to hash passwords with bcrypt verification
+- [x] Add hashPassword and verifyPassword functions to server/db.ts
+- [x] Update admin login procedure to use bcrypt
+- [x] Test password hashing and verification
+
+## FAQ/Knowledge Base (New Feature)
+- [x] Create FAQ database table
+- [x] Add FAQ database helper functions
+- [x] Add FAQ tRPC procedures (list, all, create, update, delete)
+- [x] Implement FAQ categories support
+- [x] Add FAQ ordering system
+- [ ] Build FAQ management page in admin panel (/admin/faq)
+- [ ] Create FAQ display page (/faq)
+- [ ] Add FAQ search functionality
+- [ ] Test FAQ functionality
+
+## SMS Notification System (New Feature)
+- [ ] Integrate SMS service (Twilio or similar)
+- [ ] Add SMS configuration in admin settings
+- [ ] Send SMS for booking confirmations
+- [ ] Send SMS for booking status updates
+- [ ] Send SMS for inquiry confirmations
+- [ ] Test SMS functionality

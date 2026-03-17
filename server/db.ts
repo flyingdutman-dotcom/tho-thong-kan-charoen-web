@@ -1,6 +1,7 @@
 import { eq, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, inquiries, InsertInquiry, portfolio, InsertPortfolio, reviews, InsertReview, bookings, InsertBooking, Booking, adminUsers, AdminUser, InsertAdminUser } from "../drizzle/schema";
+import bcrypt from "bcrypt";
+import { InsertUser, users, inquiries, InsertInquiry, portfolio, InsertPortfolio, reviews, InsertReview, bookings, InsertBooking, Booking, adminUsers, AdminUser, InsertAdminUser, faqs, FAQ, InsertFAQ } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -436,6 +437,117 @@ export async function updateAdminUserLastLogin(id: number) {
     await db.update(adminUsers).set({ lastLogin: new Date() }).where(eq(adminUsers.id, id));
   } catch (error) {
     console.error("[Database] Failed to update admin user last login:", error);
+    throw error;
+  }
+}
+
+
+// Password hashing and verification functions
+const SALT_ROUNDS = 10;
+
+export async function hashPassword(password: string): Promise<string> {
+  return bcrypt.hash(password, SALT_ROUNDS);
+}
+
+export async function verifyPassword(password: string, hash: string): Promise<boolean> {
+  return bcrypt.compare(password, hash);
+}
+
+
+// FAQs
+export async function createFAQ(question: string, answer: string, category: string, order?: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot create FAQ: database not available");
+    return null;
+  }
+
+  try {
+    const result = await db.insert(faqs).values({
+      question,
+      answer,
+      category,
+      order: order || 0,
+      isPublished: true,
+    });
+    return result;
+  } catch (error) {
+    console.error("[Database] Failed to create FAQ:", error);
+    throw error;
+  }
+}
+
+export async function getFAQs(category?: string) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get FAQs: database not available");
+    return [];
+  }
+
+  try {
+    let query: any = db.select().from(faqs).where(eq(faqs.isPublished, true));
+    if (category) {
+      query = query.where(eq(faqs.category, category));
+    }
+    const result = await query.orderBy(faqs.order);
+    return result;
+  } catch (error) {
+    console.error("[Database] Failed to get FAQs:", error);
+    throw error;
+  }
+}
+
+export async function getAllFAQs() {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get FAQs: database not available");
+    return [];
+  }
+
+  try {
+    const result = await db.select().from(faqs).orderBy(faqs.order);
+    return result;
+  } catch (error) {
+    console.error("[Database] Failed to get all FAQs:", error);
+    throw error;
+  }
+}
+
+export async function updateFAQ(id: number, question?: string, answer?: string, category?: string, order?: number, isPublished?: boolean) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot update FAQ: database not available");
+    return null;
+  }
+
+  try {
+    const updateData: any = {};
+    if (question !== undefined) updateData.question = question;
+    if (answer !== undefined) updateData.answer = answer;
+    if (category !== undefined) updateData.category = category;
+    if (order !== undefined) updateData.order = order;
+    if (isPublished !== undefined) updateData.isPublished = isPublished;
+
+    await db.update(faqs).set(updateData).where(eq(faqs.id, id));
+    return await db.select().from(faqs).where(eq(faqs.id, id)).limit(1);
+  } catch (error) {
+    console.error("[Database] Failed to update FAQ:", error);
+    throw error;
+  }
+}
+
+export async function deleteFAQ(id: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot delete FAQ: database not available");
+    return false;
+  }
+
+  try {
+    await db.delete(faqs).where(eq(faqs.id, id));
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to delete FAQ:", error);
     throw error;
   }
 }
