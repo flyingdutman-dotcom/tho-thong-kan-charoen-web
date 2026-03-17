@@ -24,8 +24,8 @@ export default function AdminInquiries() {
     return <div>กำลังเปลี่ยนเส้นทาง...</div>;
   }
 
-  const { data: inquiries, isLoading, refetch } = trpc.inquiries.list.useQuery();
-  const updateStatus = trpc.inquiries.updateStatus.useMutation({
+  const { data: inquiries, isLoading, refetch } = trpc.inquiries.listAdmin.useQuery();
+  const updateStatus = trpc.inquiries.updateStatusAdmin.useMutation({
     onSuccess: () => {
       toast.success("อัปเดตสถานะสำเร็จ");
       refetch();

@@ -169,3 +169,13 @@
 - [x] Verified bcrypt password verification works correctly
 - [x] All 24 vitest tests passing
 - [x] Admin login now works with username/password authentication
+
+
+## Admin Access Control Fix (Bug Fix)
+- [x] Created public admin endpoints (listAdmin, updateStatusAdmin, deleteAdmin)
+- [x] Updated AdminDashboard to use listAdmin endpoints
+- [x] Updated AdminInquiries to use listAdmin and updateStatusAdmin
+- [x] Updated AdminReviews to use listAllAdmin, updateStatusAdmin, deleteAdmin
+- [x] Updated AdminBookings to use listAdmin, updateStatusAdmin, deleteAdmin
+- [x] All admin pages now accessible with username/password login
+- [x] All 24 vitest tests passing

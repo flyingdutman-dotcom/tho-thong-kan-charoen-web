@@ -25,6 +25,10 @@ export const appRouter = router({
     list: publicProcedure.query(async () => {
       return await getPublishedPortfolio();
     }),
+    listAll: publicProcedure.query(async () => {
+      // Public endpoint for admin pages using AdminContext (username/password login)
+      return await getPublishedPortfolio();
+    }),
     get: publicProcedure
       .input(z.object({ id: z.number() }))
       .query(async ({ input }) => {
@@ -97,6 +101,10 @@ export const appRouter = router({
       }
       return await getInquiries();
     }),
+    listAdmin: publicProcedure.query(async () => {
+      // Public endpoint for admin pages using AdminContext (username/password login)
+      return await getInquiries();
+    }),
     updateStatus: protectedProcedure
       .input(
         z.object({
@@ -111,6 +119,17 @@ export const appRouter = router({
         await updateInquiryStatus(input.id, input.status);
         return { success: true };
       }),
+    updateStatusAdmin: publicProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          status: z.enum(["new", "contacted", "completed", "rejected"]),
+        })
+      )
+      .mutation(async ({ input }) => {
+        await updateInquiryStatus(input.id, input.status);
+        return { success: true };
+      }),
   }),
 
   reviews: router({
@@ -121,6 +140,10 @@ export const appRouter = router({
       if (ctx.user?.role !== "admin") {
         throw new Error("Unauthorized");
       }
+      return await listAllReviews();
+    }),
+    listAllAdmin: publicProcedure.query(async () => {
+      // Public endpoint for admin pages using AdminContext (username/password login)
       return await listAllReviews();
     }),
     create: publicProcedure
@@ -162,12 +185,29 @@ export const appRouter = router({
         await updateReviewStatus(input.id, input.isPublished);
         return { success: true };
       }),
+    updateStatusAdmin: publicProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          isPublished: z.boolean(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        await updateReviewStatus(input.id, input.isPublished);
+        return { success: true };
+      }),
     delete: protectedProcedure
       .input(z.object({ id: z.number() }))
       .mutation(async ({ input, ctx }) => {
         if (ctx.user?.role !== "admin") {
           throw new Error("Unauthorized");
         }
+        await deleteReview(input.id);
+        return { success: true };
+      }),
+    deleteAdmin: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
         await deleteReview(input.id);
         return { success: true };
       }),
@@ -252,6 +292,10 @@ export const appRouter = router({
     list: adminProcedure.query(async () => {
       return await getBookings();
     }),
+    listAdmin: publicProcedure.query(async () => {
+      // Public endpoint for admin pages using AdminContext (username/password login)
+      return await getBookings();
+    }),
     get: publicProcedure
       .input(z.object({ id: z.number() }))
       .query(async ({ input }) => {
@@ -269,6 +313,23 @@ export const appRouter = router({
         return { success: true };
       }),
     delete: adminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteBooking(input.id);
+        return { success: true };
+      }),
+    updateStatusAdmin: publicProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          status: z.enum(["pending", "confirmed", "completed", "cancelled"]),
+        })
+      )
+      .mutation(async ({ input }) => {
+        await updateBookingStatus(input.id, input.status);
+        return { success: true };
+      }),
+    deleteAdmin: publicProcedure
       .input(z.object({ id: z.number() }))
       .mutation(async ({ input }) => {
         await deleteBooking(input.id);

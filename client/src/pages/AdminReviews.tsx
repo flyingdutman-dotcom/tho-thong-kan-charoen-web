@@ -7,8 +7,8 @@ import { Loader2, Trash2, Eye, EyeOff, Star } from "lucide-react";
 import { toast } from "sonner";
 
 export default function AdminReviews() {
-  const { data: reviews, isLoading, refetch } = trpc.reviews.listAll.useQuery();
-  const updateStatus = trpc.reviews.updateStatus.useMutation({
+  const { data: reviews, isLoading, refetch } = trpc.reviews.listAllAdmin.useQuery();
+  const updateStatus = trpc.reviews.updateStatusAdmin.useMutation({
     onSuccess: () => {
       toast.success("อัปเดตสถานะสำเร็จ");
       refetch();
@@ -18,7 +18,7 @@ export default function AdminReviews() {
     },
   });
 
-  const deleteReview = trpc.reviews.delete.useMutation({
+  const deleteReview = trpc.reviews.deleteAdmin.useMutation({
     onSuccess: () => {
       toast.success("ลบรีวิวสำเร็จ");
       refetch();

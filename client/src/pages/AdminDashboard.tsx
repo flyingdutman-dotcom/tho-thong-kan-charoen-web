@@ -20,8 +20,8 @@ export default function AdminDashboard() {
   if (!isAdminLoggedIn) {
     return <div>กำลังเปลี่ยนเส้นทาง...</div>;
   }
-  const { data: inquiries, isLoading: inquiriesLoading } = trpc.inquiries.list.useQuery();
-  const { data: portfolio, isLoading: portfolioLoading } = trpc.portfolio.list.useQuery();
+  const { data: inquiries, isLoading: inquiriesLoading } = trpc.inquiries.listAdmin.useQuery();
+  const { data: portfolio, isLoading: portfolioLoading } = trpc.portfolio.listAll.useQuery();
 
   const newInquiries = inquiries?.filter((i) => i.status === "new").length || 0;
   const totalInquiries = inquiries?.length || 0;

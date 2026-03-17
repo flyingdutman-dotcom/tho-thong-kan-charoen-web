@@ -24,8 +24,8 @@ const STATUS_LABELS = {
 export default function AdminBookings() {
   const [selectedStatus, setSelectedStatus] = useState<string>("");
 
-  const { data: bookings, isLoading, refetch } = trpc.bookings.list.useQuery();
-  const updateStatus = trpc.bookings.updateStatus.useMutation({
+  const { data: bookings, isLoading, refetch } = trpc.bookings.listAdmin.useQuery();
+  const updateStatus = trpc.bookings.updateStatusAdmin.useMutation({
     onSuccess: () => {
       toast.success("อัปเดตสถานะสำเร็จ");
       refetch();
@@ -35,7 +35,7 @@ export default function AdminBookings() {
     },
   });
 
-  const deleteBooking = trpc.bookings.delete.useMutation({
+  const deleteBooking = trpc.bookings.deleteAdmin.useMutation({
     onSuccess: () => {
       toast.success("ลบการจองสำเร็จ");
       refetch();
