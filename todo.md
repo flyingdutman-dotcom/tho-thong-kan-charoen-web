@@ -159,3 +159,13 @@
 - [ ] Send SMS for booking status updates
 - [ ] Send SMS for inquiry confirmations
 - [ ] Test SMS functionality
+
+
+## Admin Login Authentication Fix (Bug Fix)
+- [x] Fixed admin.login procedure to use TRPCError instead of Error
+- [x] Added proper error handling with try-catch in login procedure
+- [x] Hash admin password with bcrypt in database
+- [x] Created hash-admin-password.mjs script to update existing passwords
+- [x] Verified bcrypt password verification works correctly
+- [x] All 24 vitest tests passing
+- [x] Admin login now works with username/password authentication

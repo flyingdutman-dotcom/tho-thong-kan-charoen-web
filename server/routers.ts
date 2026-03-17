@@ -3,6 +3,7 @@ import { adminProcedure } from "./_core/trpc";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createInquiry, getInquiries, updateInquiryStatus, getPublishedPortfolio, getPortfolioById, createPortfolioItem, createReview, listPublishedReviews, listAllReviews, updateReviewStatus, deleteReview, createBooking, getBookings, getBookingById, updateBookingStatus, deleteBooking, getAdminUserByUsername, updateAdminUserLastLogin, verifyPassword, hashPassword, createFAQ, getFAQs, getAllFAQs, updateFAQ, deleteFAQ } from "./db";
 import { notifyOwner } from "./_core/notification";
@@ -181,19 +182,36 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ input, ctx }) => {
-        const adminUser = await getAdminUserByUsername(input.username);
-        if (!adminUser) {
-          throw new Error("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
-        }
+        try {
+          const adminUser = await getAdminUserByUsername(input.username);
+          if (!adminUser) {
+            throw new TRPCError({
+              code: "UNAUTHORIZED",
+              message: "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง",
+            });
+          }
 
-        // Verify password with bcrypt
-        const isPasswordValid = await verifyPassword(input.password, adminUser.password);
-        if (!isPasswordValid) {
-          throw new Error("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
-        }
+          // Verify password with bcrypt
+          const isPasswordValid = await verifyPassword(input.password, adminUser.password);
+          if (!isPasswordValid) {
+            throw new TRPCError({
+              code: "UNAUTHORIZED",
+              message: "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง",
+            });
+          }
 
-        await updateAdminUserLastLogin(adminUser.id);
-        return { success: true, adminId: adminUser.id };
+          await updateAdminUserLastLogin(adminUser.id);
+          return { success: true, adminId: adminUser.id };
+        } catch (error) {
+          if (error instanceof TRPCError) {
+            throw error;
+          }
+          console.error("Admin login error:", error);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "เกิดข้อผิดพลาดในการล็อคอิน กรุณาลองใหม่",
+          });
+        }
       }),
   }),
 
