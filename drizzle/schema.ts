@@ -137,3 +137,26 @@ export const faqs = mysqlTable("faqs", {
 
 export type FAQ = typeof faqs.$inferSelect;
 export type InsertFAQ = typeof faqs.$inferInsert;
+
+
+/**
+ * Documents table for storing company documents.
+ * Supports quotations, invoices, purchase orders, work orders, certificates, and contracts.
+ */
+export const documents = mysqlTable("documents", {
+  id: int("id").autoincrement().primaryKey(),
+  documentType: mysqlEnum("documentType", ["quotation", "invoice", "purchase-order", "work-order", "certificate", "contract"]).notNull(),
+  documentName: varchar("documentName", { length: 255 }).notNull(),
+  fileKey: varchar("fileKey", { length: 500 }).notNull(), // S3 key for file storage
+  fileUrl: varchar("fileUrl", { length: 500 }).notNull(), // CDN URL for file access
+  fileName: varchar("fileName", { length: 255 }).notNull(), // Original file name
+  fileSize: int("fileSize").notNull(), // File size in bytes
+  mimeType: varchar("mimeType", { length: 100 }).notNull(), // e.g., "application/pdf"
+  description: text("description"), // Optional description
+  uploadedBy: int("uploadedBy").notNull(), // Admin user ID who uploaded
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Document = typeof documents.$inferSelect;
+export type InsertDocument = typeof documents.$inferInsert;

@@ -187,3 +187,16 @@
 - [x] Display admin username from AdminContext session
 - [x] Support logout for both authentication methods
 - [x] All 24 vitest tests passing
+
+
+## Document Management System (New Feature)
+- [x] Add documents table to database schema
+- [x] Create migration SQL for documents table
+- [x] Create database query helpers for documents
+- [x] Create tRPC procedures: documents.listAdmin, documents.uploadAdmin, documents.deleteAdmin
+- [x] Create AdminDocuments page UI
+- [x] Add document upload form with file validation
+- [x] Add document list with search and filtering
+- [x] Add download and delete functionality
+- [x] Add documents menu item to AdminLayout
+- [x] All 24 vitest tests passing

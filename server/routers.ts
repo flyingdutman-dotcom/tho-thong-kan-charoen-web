@@ -5,7 +5,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { createInquiry, getInquiries, updateInquiryStatus, getPublishedPortfolio, getPortfolioById, createPortfolioItem, createReview, listPublishedReviews, listAllReviews, updateReviewStatus, deleteReview, createBooking, getBookings, getBookingById, updateBookingStatus, deleteBooking, getAdminUserByUsername, updateAdminUserLastLogin, verifyPassword, hashPassword, createFAQ, getFAQs, getAllFAQs, updateFAQ, deleteFAQ } from "./db";
+import { createInquiry, getInquiries, updateInquiryStatus, getPublishedPortfolio, getPortfolioById, createPortfolioItem, createReview, listPublishedReviews, listAllReviews, updateReviewStatus, deleteReview, createBooking, getBookings, getBookingById, updateBookingStatus, deleteBooking, getAdminUserByUsername, updateAdminUserLastLogin, verifyPassword, hashPassword, createFAQ, getFAQs, getAllFAQs, updateFAQ, deleteFAQ, createDocument, getAllDocuments, getDocumentById, deleteDocument } from "./db";
 import { notifyOwner } from "./_core/notification";
 
 export const appRouter = router({
@@ -376,6 +376,35 @@ export const appRouter = router({
       .input(z.object({ id: z.number() }))
       .mutation(async ({ input }) => {
         await deleteFAQ(input.id);
+        return { success: true };
+      }),
+  }),
+
+  documents: router({
+    listAdmin: publicProcedure.query(async () => {
+      return await getAllDocuments();
+    }),
+    uploadAdmin: publicProcedure
+      .input(
+        z.object({
+          documentType: z.enum(["quotation", "invoice", "purchase-order", "work-order", "certificate", "contract"]),
+          documentName: z.string().min(1, "ชื่อเอกสารจำเป็นต้องระบุ"),
+          fileKey: z.string().min(1, "ไฟล์จำเป็นต้องระบุ"),
+          fileUrl: z.string().min(1, "URL ไฟล์จำเป็นต้องระบุ"),
+          fileName: z.string().min(1, "ชื่อไฟล์จำเป็นต้องระบุ"),
+          fileSize: z.number().min(1, "ขนาดไฟล์จำเป็นต้องระบุ"),
+          mimeType: z.string().min(1, "ประเภทไฟล์จำเป็นต้องระบุ"),
+          description: z.string().optional(),
+          uploadedBy: z.number(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        return await createDocument(input);
+      }),
+    deleteAdmin: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteDocument(input.id);
         return { success: true };
       }),
   }),

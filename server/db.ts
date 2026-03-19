@@ -1,7 +1,7 @@
 import { eq, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import bcrypt from "bcrypt";
-import { InsertUser, users, inquiries, InsertInquiry, portfolio, InsertPortfolio, reviews, InsertReview, bookings, InsertBooking, Booking, adminUsers, AdminUser, InsertAdminUser, faqs, FAQ, InsertFAQ } from "../drizzle/schema";
+import { InsertUser, users, inquiries, InsertInquiry, portfolio, InsertPortfolio, reviews, InsertReview, bookings, InsertBooking, Booking, adminUsers, AdminUser, InsertAdminUser, faqs, FAQ, InsertFAQ, documents, Document, InsertDocument } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -548,6 +548,104 @@ export async function deleteFAQ(id: number) {
     return true;
   } catch (error) {
     console.error("[Database] Failed to delete FAQ:", error);
+    throw error;
+  }
+}
+
+
+// Documents
+export async function createDocument(data: InsertDocument) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot create document: database not available");
+    return null;
+  }
+
+  try {
+    const result = await db.insert(documents).values(data);
+    return result;
+  } catch (error) {
+    console.error("[Database] Failed to create document:", error);
+    throw error;
+  }
+}
+
+export async function getAllDocuments() {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get documents: database not available");
+    return [];
+  }
+
+  try {
+    const result = await db.select().from(documents).orderBy(desc(documents.createdAt));
+    return result;
+  } catch (error) {
+    console.error("[Database] Failed to get documents:", error);
+    throw error;
+  }
+}
+
+export async function getDocumentsByType(documentType: string) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get documents: database not available");
+    return [];
+  }
+
+  try {
+    const result = await db.select().from(documents).where(eq(documents.documentType, documentType as any)).orderBy(desc(documents.createdAt));
+    return result;
+  } catch (error) {
+    console.error("[Database] Failed to get documents by type:", error);
+    throw error;
+  }
+}
+
+export async function getDocumentById(id: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get document: database not available");
+    return undefined;
+  }
+
+  try {
+    const result = await db.select().from(documents).where(eq(documents.id, id)).limit(1);
+    return result.length > 0 ? result[0] : undefined;
+  } catch (error) {
+    console.error("[Database] Failed to get document:", error);
+    throw error;
+  }
+}
+
+export async function updateDocument(id: number, data: Partial<InsertDocument>) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot update document: database not available");
+    return null;
+  }
+
+  try {
+    await db.update(documents).set(data).where(eq(documents.id, id));
+    return await getDocumentById(id);
+  } catch (error) {
+    console.error("[Database] Failed to update document:", error);
+    throw error;
+  }
+}
+
+export async function deleteDocument(id: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot delete document: database not available");
+    return false;
+  }
+
+  try {
+    await db.delete(documents).where(eq(documents.id, id));
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to delete document:", error);
     throw error;
   }
 }
