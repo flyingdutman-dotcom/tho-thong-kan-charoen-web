@@ -83,7 +83,6 @@ export default function AdminBookings() {
                 <SelectValue placeholder="ทั้งหมด" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">ทั้งหมด</SelectItem>
                 <SelectItem value="pending">รอการยืนยัน</SelectItem>
                 <SelectItem value="confirmed">ยืนยันแล้ว</SelectItem>
                 <SelectItem value="completed">เสร็จสิ้น</SelectItem>
