@@ -17,6 +17,7 @@ import AdminPortfolio from "./pages/AdminPortfolio";
 import AdminReviews from "./pages/AdminReviews";
 import AdminBookings from "./pages/AdminBookings";
 import AdminDocuments from "./pages/AdminDocuments";
+import AdminStats from "./pages/AdminStats";
 import AdminLogin from "./pages/AdminLogin";
 
 function Router() {
@@ -34,6 +35,7 @@ function Router() {
       <Route path="/admin/reviews" component={AdminReviews} />
       <Route path="/admin/bookings" component={AdminBookings} />
       <Route path="/admin/documents" component={AdminDocuments} />
+      <Route path="/admin/stats" component={AdminStats} />
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/404" component={NotFound} />
       {/* Final fallback route */}
