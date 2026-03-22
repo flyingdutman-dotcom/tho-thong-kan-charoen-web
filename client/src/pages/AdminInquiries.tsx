@@ -35,6 +35,16 @@ export default function AdminInquiries() {
     },
   });
 
+  const deleteInquiry = trpc.inquiries.deleteAdmin.useMutation({
+    onSuccess: () => {
+      toast.success("ลบใบขอสำเร็จ");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(error.message || "เกิดข้อผิดพลาด");
+    },
+  });
+
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
 
   const filteredInquiries =
@@ -204,6 +214,12 @@ export default function AdminInquiries() {
                             variant="ghost"
                             size="sm"
                             className="text-muted-foreground hover:text-red-500"
+                            onClick={() => {
+                              if (confirm("คุณแน่ใจว่าต้องการลบใบขอนี้?")) {
+                                deleteInquiry.mutate({ id: inquiry.id });
+                              }
+                            }}
+                            disabled={deleteInquiry.isPending}
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>

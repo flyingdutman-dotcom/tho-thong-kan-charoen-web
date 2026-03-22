@@ -649,3 +649,34 @@ export async function deleteDocument(id: number) {
     throw error;
   }
 }
+
+
+export async function deleteInquiry(id: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot delete inquiry: database not available");
+    return false;
+  }
+  try {
+    await db.delete(inquiries).where(eq(inquiries.id, id));
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to delete inquiry:", error);
+    throw error;
+  }
+}
+
+export async function deletePortfolio(id: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot delete portfolio: database not available");
+    return false;
+  }
+  try {
+    await db.delete(portfolio).where(eq(portfolio.id, id));
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to delete portfolio:", error);
+    throw error;
+  }
+}

@@ -5,7 +5,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { createInquiry, getInquiries, updateInquiryStatus, getPublishedPortfolio, getPortfolioById, createPortfolioItem, createReview, listPublishedReviews, listAllReviews, updateReviewStatus, deleteReview, createBooking, getBookings, getBookingById, updateBookingStatus, deleteBooking, getAdminUserByUsername, updateAdminUserLastLogin, verifyPassword, hashPassword, createFAQ, getFAQs, getAllFAQs, updateFAQ, deleteFAQ, createDocument, getAllDocuments, getDocumentById, deleteDocument } from "./db";
+import { createInquiry, getInquiries, updateInquiryStatus, deleteInquiry, getPublishedPortfolio, getPortfolioById, createPortfolioItem, deletePortfolio, createReview, listPublishedReviews, listAllReviews, updateReviewStatus, deleteReview, createBooking, getBookings, getBookingById, updateBookingStatus, deleteBooking, getAdminUserByUsername, updateAdminUserLastLogin, verifyPassword, hashPassword, createFAQ, getFAQs, getAllFAQs, updateFAQ, deleteFAQ, createDocument, getAllDocuments, getDocumentById, deleteDocument } from "./db";
 import { notifyOwner } from "./_core/notification";
 
 export const appRouter = router({
@@ -60,7 +60,14 @@ export const appRouter = router({
           completedDate: input.completedDate || null,
         });
       }),
+    deleteAdmin: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deletePortfolio(input.id);
+        return { success: true };
+      }),
   }),
+
 
   inquiries: router({
     submit: publicProcedure
@@ -130,7 +137,14 @@ export const appRouter = router({
         await updateInquiryStatus(input.id, input.status);
         return { success: true };
       }),
+    deleteAdmin: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteInquiry(input.id);
+        return { success: true };
+      }),
   }),
+
 
   reviews: router({
     list: publicProcedure.query(async () => {
