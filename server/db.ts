@@ -1,7 +1,7 @@
 import { eq, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import bcrypt from "bcrypt";
-import { InsertUser, users, inquiries, InsertInquiry, portfolio, InsertPortfolio, reviews, InsertReview, bookings, InsertBooking, Booking, adminUsers, AdminUser, InsertAdminUser, faqs, FAQ, InsertFAQ, documents, Document, InsertDocument } from "../drizzle/schema";
+import { InsertUser, users, inquiries, InsertInquiry, portfolio, InsertPortfolio, reviews, InsertReview, bookings, InsertBooking, Booking, adminUsers, AdminUser, InsertAdminUser, faqs, FAQ, InsertFAQ, documents, Document, InsertDocument, purchaseRequisitions, PurchaseRequisition, InsertPurchaseRequisition, purchaseOrders, PurchaseOrder, InsertPurchaseOrder, stockRequisitions, StockRequisition, InsertStockRequisition, jobOrders, JobOrder, InsertJobOrder, fieldServiceReports, FieldServiceReport, InsertFieldServiceReport, dailyLogs, DailyLog, InsertDailyLog, quotations, Quotation, InsertQuotation, deliveryOrders, DeliveryOrder, InsertDeliveryOrder, invoices, Invoice, InsertInvoice } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -679,4 +679,284 @@ export async function deletePortfolio(id: number) {
     console.error("[Database] Failed to delete portfolio:", error);
     throw error;
   }
+}
+
+
+// ============================================
+// Purchase Requisition Helpers
+// ============================================
+export async function createPurchaseRequisition(data: InsertPurchaseRequisition) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(purchaseRequisitions).values(data);
+  return result;
+}
+
+export async function getPurchaseRequisitions() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(purchaseRequisitions).orderBy(desc(purchaseRequisitions.createdAt));
+}
+
+export async function getPurchaseRequisitionById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(purchaseRequisitions).where(eq(purchaseRequisitions.id, id));
+  return result[0] || null;
+}
+
+export async function updatePurchaseRequisition(id: number, data: Partial<PurchaseRequisition>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(purchaseRequisitions).set(data).where(eq(purchaseRequisitions.id, id));
+}
+
+export async function deletePurchaseRequisition(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(purchaseRequisitions).where(eq(purchaseRequisitions.id, id));
+}
+
+// ============================================
+// Purchase Order Helpers
+// ============================================
+export async function createPurchaseOrder(data: InsertPurchaseOrder) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.insert(purchaseOrders).values(data);
+}
+
+export async function getPurchaseOrders() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(purchaseOrders).orderBy(desc(purchaseOrders.createdAt));
+}
+
+export async function getPurchaseOrderById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(purchaseOrders).where(eq(purchaseOrders.id, id));
+  return result[0] || null;
+}
+
+export async function updatePurchaseOrder(id: number, data: Partial<PurchaseOrder>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(purchaseOrders).set(data).where(eq(purchaseOrders.id, id));
+}
+
+export async function deletePurchaseOrder(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(purchaseOrders).where(eq(purchaseOrders.id, id));
+}
+
+// ============================================
+// Stock Requisition Helpers
+// ============================================
+export async function createStockRequisition(data: InsertStockRequisition) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.insert(stockRequisitions).values(data);
+}
+
+export async function getStockRequisitions() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(stockRequisitions).orderBy(desc(stockRequisitions.createdAt));
+}
+
+export async function updateStockRequisition(id: number, data: Partial<StockRequisition>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(stockRequisitions).set(data).where(eq(stockRequisitions.id, id));
+}
+
+export async function deleteStockRequisition(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(stockRequisitions).where(eq(stockRequisitions.id, id));
+}
+
+// ============================================
+// Job Order Helpers
+// ============================================
+export async function createJobOrder(data: InsertJobOrder) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.insert(jobOrders).values(data);
+}
+
+export async function getJobOrders() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(jobOrders).orderBy(desc(jobOrders.createdAt));
+}
+
+export async function getJobOrderById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(jobOrders).where(eq(jobOrders.id, id));
+  return result[0] || null;
+}
+
+export async function updateJobOrder(id: number, data: Partial<JobOrder>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(jobOrders).set(data).where(eq(jobOrders.id, id));
+}
+
+export async function deleteJobOrder(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(jobOrders).where(eq(jobOrders.id, id));
+}
+
+// ============================================
+// Field Service Report Helpers
+// ============================================
+export async function createFieldServiceReport(data: InsertFieldServiceReport) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.insert(fieldServiceReports).values(data);
+}
+
+export async function getFieldServiceReports() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(fieldServiceReports).orderBy(desc(fieldServiceReports.createdAt));
+}
+
+export async function updateFieldServiceReport(id: number, data: Partial<FieldServiceReport>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(fieldServiceReports).set(data).where(eq(fieldServiceReports.id, id));
+}
+
+export async function deleteFieldServiceReport(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(fieldServiceReports).where(eq(fieldServiceReports.id, id));
+}
+
+// ============================================
+// Daily Log Helpers
+// ============================================
+export async function createDailyLog(data: InsertDailyLog) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.insert(dailyLogs).values(data);
+}
+
+export async function getDailyLogs() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(dailyLogs).orderBy(desc(dailyLogs.createdAt));
+}
+
+export async function updateDailyLog(id: number, data: Partial<DailyLog>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(dailyLogs).set(data).where(eq(dailyLogs.id, id));
+}
+
+export async function deleteDailyLog(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(dailyLogs).where(eq(dailyLogs.id, id));
+}
+
+// ============================================
+// Quotation Helpers
+// ============================================
+export async function createQuotation(data: InsertQuotation) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.insert(quotations).values(data);
+}
+
+export async function getQuotations() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(quotations).orderBy(desc(quotations.createdAt));
+}
+
+export async function getQuotationById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(quotations).where(eq(quotations.id, id));
+  return result[0] || null;
+}
+
+export async function updateQuotation(id: number, data: Partial<Quotation>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(quotations).set(data).where(eq(quotations.id, id));
+}
+
+export async function deleteQuotation(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(quotations).where(eq(quotations.id, id));
+}
+
+// ============================================
+// Delivery Order Helpers
+// ============================================
+export async function createDeliveryOrder(data: InsertDeliveryOrder) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.insert(deliveryOrders).values(data);
+}
+
+export async function getDeliveryOrders() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(deliveryOrders).orderBy(desc(deliveryOrders.createdAt));
+}
+
+export async function updateDeliveryOrder(id: number, data: Partial<DeliveryOrder>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(deliveryOrders).set(data).where(eq(deliveryOrders.id, id));
+}
+
+export async function deleteDeliveryOrder(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(deliveryOrders).where(eq(deliveryOrders.id, id));
+}
+
+// ============================================
+// Invoice Helpers
+// ============================================
+export async function createInvoice(data: InsertInvoice) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.insert(invoices).values(data);
+}
+
+export async function getInvoices() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(invoices).orderBy(desc(invoices.createdAt));
+}
+
+export async function getInvoiceById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(invoices).where(eq(invoices.id, id));
+  return result[0] || null;
+}
+
+export async function updateInvoice(id: number, data: Partial<Invoice>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(invoices).set(data).where(eq(invoices.id, id));
+}
+
+export async function deleteInvoice(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(invoices).where(eq(invoices.id, id));
 }

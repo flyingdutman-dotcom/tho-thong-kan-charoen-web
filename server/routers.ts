@@ -5,7 +5,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { createInquiry, getInquiries, updateInquiryStatus, deleteInquiry, getPublishedPortfolio, getPortfolioById, createPortfolioItem, deletePortfolio, createReview, listPublishedReviews, listAllReviews, updateReviewStatus, deleteReview, createBooking, getBookings, getBookingById, updateBookingStatus, deleteBooking, getAdminUserByUsername, updateAdminUserLastLogin, verifyPassword, hashPassword, createFAQ, getFAQs, getAllFAQs, updateFAQ, deleteFAQ, createDocument, getAllDocuments, getDocumentById, deleteDocument } from "./db";
+import { createInquiry, getInquiries, updateInquiryStatus, deleteInquiry, getPublishedPortfolio, getPortfolioById, createPortfolioItem, deletePortfolio, createReview, listPublishedReviews, listAllReviews, updateReviewStatus, deleteReview, createBooking, getBookings, getBookingById, updateBookingStatus, deleteBooking, getAdminUserByUsername, updateAdminUserLastLogin, verifyPassword, hashPassword, createFAQ, getFAQs, getAllFAQs, updateFAQ, deleteFAQ, createDocument, getAllDocuments, getDocumentById, deleteDocument, createPurchaseRequisition, getPurchaseRequisitions, updatePurchaseRequisition, deletePurchaseRequisition, createPurchaseOrder, getPurchaseOrders, updatePurchaseOrder, deletePurchaseOrder, createStockRequisition, getStockRequisitions, updateStockRequisition, deleteStockRequisition, createJobOrder, getJobOrders, updateJobOrder, deleteJobOrder, createFieldServiceReport, getFieldServiceReports, updateFieldServiceReport, deleteFieldServiceReport, createDailyLog, getDailyLogs, updateDailyLog, deleteDailyLog, createQuotation, getQuotations, updateQuotation, deleteQuotation, createDeliveryOrder, getDeliveryOrders, updateDeliveryOrder, deleteDeliveryOrder, createInvoice, getInvoices, updateInvoice, deleteInvoice } from "./db";
 import { notifyOwner } from "./_core/notification";
 
 export const appRouter = router({
@@ -419,6 +419,365 @@ export const appRouter = router({
       .input(z.object({ id: z.number() }))
       .mutation(async ({ input }) => {
         await deleteDocument(input.id);
+        return { success: true };
+      }),
+  }),
+
+  // Document Generation Routers
+  purchaseRequisitions: router({
+    list: publicProcedure.query(async () => {
+      return await getPurchaseRequisitions();
+    }),
+    create: publicProcedure
+      .input(z.object({
+        prNumber: z.string(),
+        requestedBy: z.string(),
+        itemDescription: z.string(),
+        estimatedCost: z.string(),
+        purpose: z.string(),
+        status: z.enum(["draft", "pending", "approved", "rejected"]).optional(),
+        approvedBy: z.string().optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        return await createPurchaseRequisition(input as any);
+      }),
+    update: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        status: z.enum(["draft", "pending", "approved", "rejected"]).optional(),
+        approvedBy: z.string().optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        await updatePurchaseRequisition(input.id, input);
+        return { success: true };
+      }),
+    delete: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deletePurchaseRequisition(input.id);
+        return { success: true };
+      }),
+  }),
+
+  purchaseOrders: router({
+    list: publicProcedure.query(async () => {
+      return await getPurchaseOrders();
+    }),
+    create: publicProcedure
+      .input(z.object({
+        poNumber: z.string(),
+        prId: z.number().optional(),
+        supplierName: z.string(),
+        supplierContact: z.string().optional(),
+        itemDescription: z.string(),
+        quantity: z.number(),
+        unitPrice: z.string(),
+        totalAmount: z.string(),
+        deliveryDate: z.string().optional(),
+        status: z.enum(["draft", "sent", "confirmed", "delivered", "cancelled"]).optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        return await createPurchaseOrder(input as any);
+      }),
+    update: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        status: z.enum(["draft", "sent", "confirmed", "delivered", "cancelled"]).optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        await updatePurchaseOrder(input.id, input);
+        return { success: true };
+      }),
+    delete: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deletePurchaseOrder(input.id);
+        return { success: true };
+      }),
+  }),
+
+  stockRequisitions: router({
+    list: publicProcedure.query(async () => {
+      return await getStockRequisitions();
+    }),
+    create: publicProcedure
+      .input(z.object({
+        srNumber: z.string(),
+        requestedBy: z.string(),
+        projectName: z.string(),
+        itemDescription: z.string(),
+        quantity: z.number(),
+        status: z.enum(["draft", "approved", "issued", "returned"]).optional(),
+        approvedBy: z.string().optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        return await createStockRequisition(input as any);
+      }),
+    update: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        status: z.enum(["draft", "approved", "issued", "returned"]).optional(),
+        approvedBy: z.string().optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        await updateStockRequisition(input.id, input);
+        return { success: true };
+      }),
+    delete: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteStockRequisition(input.id);
+        return { success: true };
+      }),
+  }),
+
+  jobOrders: router({
+    list: publicProcedure.query(async () => {
+      return await getJobOrders();
+    }),
+    create: publicProcedure
+      .input(z.object({
+        joNumber: z.string(),
+        customerName: z.string(),
+        customerPhone: z.string(),
+        serviceType: z.string(),
+        workLocation: z.string(),
+        problemDescription: z.string(),
+        scheduledDate: z.string(),
+        scheduledTime: z.string().optional(),
+        estimatedDuration: z.string().optional(),
+        assignedTo: z.string().optional(),
+        status: z.enum(["draft", "scheduled", "in-progress", "completed", "cancelled"]).optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        return await createJobOrder(input as any);
+      }),
+    update: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        status: z.enum(["draft", "scheduled", "in-progress", "completed", "cancelled"]).optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        await updateJobOrder(input.id, input);
+        return { success: true };
+      }),
+    delete: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteJobOrder(input.id);
+        return { success: true };
+      }),
+  }),
+
+  fieldServiceReports: router({
+    list: publicProcedure.query(async () => {
+      return await getFieldServiceReports();
+    }),
+    create: publicProcedure
+      .input(z.object({
+        fsrNumber: z.string(),
+        joId: z.number().optional(),
+        technician: z.string(),
+        workDate: z.string(),
+        startTime: z.string().optional(),
+        endTime: z.string().optional(),
+        pipeLength: z.string().optional(),
+        wasteQuantity: z.string().optional(),
+        beforePhotoUrl: z.string().optional(),
+        afterPhotoUrl: z.string().optional(),
+        workCompleted: z.boolean().optional(),
+        issues: z.string().optional(),
+        customerSignature: z.string().optional(),
+        status: z.enum(["draft", "pending-approval", "approved", "rejected"]).optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        return await createFieldServiceReport(input as any);
+      }),
+    update: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        status: z.enum(["draft", "pending-approval", "approved", "rejected"]).optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        await updateFieldServiceReport(input.id, input);
+        return { success: true };
+      }),
+    delete: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteFieldServiceReport(input.id);
+        return { success: true };
+      }),
+  }),
+
+  dailyLogs: router({
+    list: publicProcedure.query(async () => {
+      return await getDailyLogs();
+    }),
+    create: publicProcedure
+      .input(z.object({
+        dlNumber: z.string(),
+        projectName: z.string(),
+        logDate: z.string(),
+        workersCount: z.number(),
+        equipmentUsed: z.string().optional(),
+        workDone: z.string().optional(),
+        obstacles: z.string().optional(),
+        weatherCondition: z.string().optional(),
+        safetyIncidents: z.string().optional(),
+        supervisor: z.string(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        return await createDailyLog(input as any);
+      }),
+    update: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        await updateDailyLog(input.id, input);
+        return { success: true };
+      }),
+    delete: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteDailyLog(input.id);
+        return { success: true };
+      }),
+  }),
+
+  quotations: router({
+    list: publicProcedure.query(async () => {
+      return await getQuotations();
+    }),
+    create: publicProcedure
+      .input(z.object({
+        quoteNumber: z.string(),
+        customerName: z.string(),
+        customerPhone: z.string(),
+        customerEmail: z.string().optional(),
+        serviceType: z.string(),
+        workLocation: z.string(),
+        scopeOfWork: z.string(),
+        laborCost: z.string(),
+        materialCost: z.string().optional(),
+        totalAmount: z.string(),
+        validUntil: z.string().optional(),
+        status: z.enum(["draft", "sent", "accepted", "rejected", "expired"]).optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        return await createQuotation(input as any);
+      }),
+    update: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        status: z.enum(["draft", "sent", "accepted", "rejected", "expired"]).optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        await updateQuotation(input.id, input);
+        return { success: true };
+      }),
+    delete: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteQuotation(input.id);
+        return { success: true };
+      }),
+  }),
+
+  deliveryOrders: router({
+    list: publicProcedure.query(async () => {
+      return await getDeliveryOrders();
+    }),
+    create: publicProcedure
+      .input(z.object({
+        doNumber: z.string(),
+        quoteId: z.number().optional(),
+        customerName: z.string(),
+        workDate: z.string(),
+        workDescription: z.string(),
+        workQuality: z.string().optional(),
+        customerSignature: z.string().optional(),
+        signedDate: z.string().optional(),
+        status: z.enum(["draft", "pending-signature", "signed", "rejected"]).optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        return await createDeliveryOrder(input as any);
+      }),
+    update: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        status: z.enum(["draft", "pending-signature", "signed", "rejected"]).optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        await updateDeliveryOrder(input.id, input);
+        return { success: true };
+      }),
+    delete: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteDeliveryOrder(input.id);
+        return { success: true };
+      }),
+  }),
+
+  invoices: router({
+    list: publicProcedure.query(async () => {
+      return await getInvoices();
+    }),
+    create: publicProcedure
+      .input(z.object({
+        invoiceNumber: z.string(),
+        doId: z.number().optional(),
+        customerName: z.string(),
+        customerTaxId: z.string().optional(),
+        customerAddress: z.string().optional(),
+        invoiceDate: z.string(),
+        dueDate: z.string().optional(),
+        laborCost: z.string(),
+        materialCost: z.string().optional(),
+        taxRate: z.string().optional(),
+        taxAmount: z.string(),
+        totalAmount: z.string(),
+        paymentStatus: z.enum(["unpaid", "partial", "paid"]).optional(),
+        paymentMethod: z.string().optional(),
+        paidAmount: z.string().optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        return await createInvoice(input as any);
+      }),
+    update: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        paymentStatus: z.enum(["unpaid", "partial", "paid"]).optional(),
+        paidAmount: z.string().optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        await updateInvoice(input.id, input);
+        return { success: true };
+      }),
+    delete: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteInvoice(input.id);
         return { success: true };
       }),
   }),

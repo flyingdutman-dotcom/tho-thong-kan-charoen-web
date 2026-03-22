@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useAdmin } from "@/contexts/AdminContext";
-import { LogOut, Menu, X, LayoutDashboard, FileText, Image, BarChart3, Star, Calendar, File } from "lucide-react";
+import { LogOut, Menu, X, LayoutDashboard, FileText, Image, BarChart3, Star, Calendar, File, FileCheck } from "lucide-react";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -50,6 +50,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { label: "รีวิว", icon: Star, href: "/admin/reviews" },
     { label: "การจอง", icon: Calendar, href: "/admin/bookings" },
     { label: "เอกสาร", icon: File, href: "/admin/documents" },
+    { label: "สร้างเอกสาร", icon: FileCheck, href: "/admin/document-generator" },
     { label: "สถิติ", icon: BarChart3, href: "/admin/stats" },
   ];
 

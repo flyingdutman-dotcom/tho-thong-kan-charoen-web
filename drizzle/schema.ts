@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, decimal, date } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -160,3 +160,227 @@ export const documents = mysqlTable("documents", {
 
 export type Document = typeof documents.$inferSelect;
 export type InsertDocument = typeof documents.$inferInsert;
+
+
+/**
+ * Purchase Requisition (PR) - ใบขอซื้อ
+ * Used internally for requesting equipment/materials approval
+ */
+export const purchaseRequisitions = mysqlTable("purchase_requisitions", {
+  id: int("id").autoincrement().primaryKey(),
+  prNumber: varchar("prNumber", { length: 50 }).notNull().unique(), // e.g., "PR-2026-001"
+  requestedBy: varchar("requestedBy", { length: 255 }).notNull(), // Department/person requesting
+  itemDescription: text("itemDescription").notNull(), // Description of items to purchase
+  estimatedCost: decimal("estimatedCost", { precision: 12, scale: 2 }).notNull(),
+  purpose: text("purpose").notNull(), // Why it's needed (e.g., project name)
+  status: mysqlEnum("status", ["draft", "pending", "approved", "rejected"]).default("draft").notNull(),
+  approvedBy: varchar("approvedBy", { length: 255 }), // Name of approver
+  approvedAt: timestamp("approvedAt"),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PurchaseRequisition = typeof purchaseRequisitions.$inferSelect;
+export type InsertPurchaseRequisition = typeof purchaseRequisitions.$inferInsert;
+
+/**
+ * Purchase Order (PO) - ใบสั่งซื้อ
+ * Sent to supplier after PR approval
+ */
+export const purchaseOrders = mysqlTable("purchase_orders", {
+  id: int("id").autoincrement().primaryKey(),
+  poNumber: varchar("poNumber", { length: 50 }).notNull().unique(), // e.g., "PO-2026-001"
+  prId: int("prId"), // Reference to PR if applicable
+  supplierName: varchar("supplierName", { length: 255 }).notNull(),
+  supplierContact: varchar("supplierContact", { length: 255 }),
+  itemDescription: text("itemDescription").notNull(),
+  quantity: int("quantity").notNull(),
+  unitPrice: decimal("unitPrice", { precision: 12, scale: 2 }).notNull(),
+  totalAmount: decimal("totalAmount", { precision: 12, scale: 2 }).notNull(),
+  deliveryDate: date("deliveryDate"),
+  status: mysqlEnum("status", ["draft", "sent", "confirmed", "delivered", "cancelled"]).default("draft").notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PurchaseOrder = typeof purchaseOrders.$inferSelect;
+export type InsertPurchaseOrder = typeof purchaseOrders.$inferInsert;
+
+/**
+ * Stock Requisition - ใบเบิกอุปกรณ์
+ * For tracking equipment/materials taken from inventory
+ */
+export const stockRequisitions = mysqlTable("stock_requisitions", {
+  id: int("id").autoincrement().primaryKey(),
+  srNumber: varchar("srNumber", { length: 50 }).notNull().unique(), // e.g., "SR-2026-001"
+  requestedBy: varchar("requestedBy", { length: 255 }).notNull(), // Team/person requesting
+  projectName: varchar("projectName", { length: 255 }).notNull(),
+  itemDescription: text("itemDescription").notNull(),
+  quantity: int("quantity").notNull(),
+  status: mysqlEnum("status", ["draft", "approved", "issued", "returned"]).default("draft").notNull(),
+  approvedBy: varchar("approvedBy", { length: 255 }),
+  approvedAt: timestamp("approvedAt"),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type StockRequisition = typeof stockRequisitions.$inferSelect;
+export type InsertStockRequisition = typeof stockRequisitions.$inferInsert;
+
+/**
+ * Job Order / Work Order - ใบสั่งงาน
+ * Details of work to be done at a specific location
+ */
+export const jobOrders = mysqlTable("job_orders", {
+  id: int("id").autoincrement().primaryKey(),
+  joNumber: varchar("joNumber", { length: 50 }).notNull().unique(), // e.g., "JO-2026-001"
+  customerName: varchar("customerName", { length: 255 }).notNull(),
+  customerPhone: varchar("customerPhone", { length: 20 }).notNull(),
+  serviceType: varchar("serviceType", { length: 100 }).notNull(), // e.g., "ลอกท่อระบายน้ำ"
+  workLocation: text("workLocation").notNull(),
+  problemDescription: text("problemDescription").notNull(), // e.g., "ท่อตันจากไขมัน"
+  scheduledDate: date("scheduledDate").notNull(),
+  scheduledTime: varchar("scheduledTime", { length: 10 }), // e.g., "09:00"
+  estimatedDuration: varchar("estimatedDuration", { length: 50 }), // e.g., "2 hours"
+  assignedTo: varchar("assignedTo", { length: 255 }), // Technician name
+  status: mysqlEnum("status", ["draft", "scheduled", "in-progress", "completed", "cancelled"]).default("draft").notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type JobOrder = typeof jobOrders.$inferSelect;
+export type InsertJobOrder = typeof jobOrders.$inferInsert;
+
+/**
+ * Field Service Report - ใบรายงานหน้างาน
+ * Completed after work is done, includes photos and measurements
+ */
+export const fieldServiceReports = mysqlTable("field_service_reports", {
+  id: int("id").autoincrement().primaryKey(),
+  fsrNumber: varchar("fsrNumber", { length: 50 }).notNull().unique(), // e.g., "FSR-2026-001"
+  joId: int("joId"), // Reference to Job Order
+  technician: varchar("technician", { length: 255 }).notNull(),
+  workDate: date("workDate").notNull(),
+  startTime: varchar("startTime", { length: 10 }),
+  endTime: varchar("endTime", { length: 10 }),
+  pipeLength: decimal("pipeLength", { precision: 8, scale: 2 }), // Length in meters
+  wasteQuantity: varchar("wasteQuantity", { length: 255 }), // e.g., "5 bags"
+  beforePhotoUrl: varchar("beforePhotoUrl", { length: 500 }),
+  afterPhotoUrl: varchar("afterPhotoUrl", { length: 500 }),
+  workCompleted: boolean("workCompleted").default(false).notNull(),
+  issues: text("issues"), // Any issues encountered
+  customerSignature: varchar("customerSignature", { length: 500 }), // URL to signature image
+  status: mysqlEnum("status", ["draft", "pending-approval", "approved", "rejected"]).default("draft").notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type FieldServiceReport = typeof fieldServiceReports.$inferSelect;
+export type InsertFieldServiceReport = typeof fieldServiceReports.$inferInsert;
+
+/**
+ * Daily Log - บันทึกประจำวัน
+ * For long-term projects, track daily progress
+ */
+export const dailyLogs = mysqlTable("daily_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  dlNumber: varchar("dlNumber", { length: 50 }).notNull().unique(), // e.g., "DL-2026-001"
+  projectName: varchar("projectName", { length: 255 }).notNull(),
+  logDate: date("logDate").notNull(),
+  workersCount: int("workersCount").notNull(), // Number of workers
+  equipmentUsed: text("equipmentUsed"), // List of equipment
+  workDone: text("workDone"), // Description of work done
+  obstacles: text("obstacles"), // Any obstacles encountered
+  weatherCondition: varchar("weatherCondition", { length: 100 }), // e.g., "Sunny", "Rainy"
+  safetyIncidents: text("safetyIncidents"), // Any safety issues
+  supervisor: varchar("supervisor", { length: 255 }).notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type DailyLog = typeof dailyLogs.$inferSelect;
+export type InsertDailyLog = typeof dailyLogs.$inferInsert;
+
+/**
+ * Quotation - ใบเสนอราคา
+ * Proposal sent to customer with scope and pricing
+ */
+export const quotations = mysqlTable("quotations", {
+  id: int("id").autoincrement().primaryKey(),
+  quoteNumber: varchar("quoteNumber", { length: 50 }).notNull().unique(), // e.g., "QT-2026-001"
+  customerName: varchar("customerName", { length: 255 }).notNull(),
+  customerPhone: varchar("customerPhone", { length: 20 }).notNull(),
+  customerEmail: varchar("customerEmail", { length: 320 }),
+  serviceType: varchar("serviceType", { length: 100 }).notNull(),
+  workLocation: text("workLocation").notNull(),
+  scopeOfWork: text("scopeOfWork").notNull(), // Detailed description of work
+  laborCost: decimal("laborCost", { precision: 12, scale: 2 }).notNull(),
+  materialCost: decimal("materialCost", { precision: 12, scale: 2 }).default("0").notNull(),
+  totalAmount: decimal("totalAmount", { precision: 12, scale: 2 }).notNull(),
+  validUntil: date("validUntil"),
+  status: mysqlEnum("status", ["draft", "sent", "accepted", "rejected", "expired"]).default("draft").notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Quotation = typeof quotations.$inferSelect;
+export type InsertQuotation = typeof quotations.$inferInsert;
+
+/**
+ * Delivery Order / Service Acceptance - ใบรับมอบงาน
+ * Customer signs to confirm work completion and satisfaction
+ */
+export const deliveryOrders = mysqlTable("delivery_orders", {
+  id: int("id").autoincrement().primaryKey(),
+  doNumber: varchar("doNumber", { length: 50 }).notNull().unique(), // e.g., "DO-2026-001"
+  quoteId: int("quoteId"), // Reference to Quotation
+  customerName: varchar("customerName", { length: 255 }).notNull(),
+  workDate: date("workDate").notNull(),
+  workDescription: text("workDescription").notNull(),
+  workQuality: varchar("workQuality", { length: 100 }), // e.g., "Excellent", "Good", "Satisfactory"
+  customerSignature: varchar("customerSignature", { length: 500 }), // URL to signature image
+  signedDate: date("signedDate"),
+  status: mysqlEnum("status", ["draft", "pending-signature", "signed", "rejected"]).default("draft").notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type DeliveryOrder = typeof deliveryOrders.$inferSelect;
+export type InsertDeliveryOrder = typeof deliveryOrders.$inferInsert;
+
+/**
+ * Invoice / Tax Invoice - ใบแจ้งหนี้
+ * Billing document sent after work completion
+ */
+export const invoices = mysqlTable("invoices", {
+  id: int("id").autoincrement().primaryKey(),
+  invoiceNumber: varchar("invoiceNumber", { length: 50 }).notNull().unique(), // e.g., "INV-2026-001"
+  doId: int("doId"), // Reference to Delivery Order
+  customerName: varchar("customerName", { length: 255 }).notNull(),
+  customerTaxId: varchar("customerTaxId", { length: 50 }),
+  customerAddress: text("customerAddress"),
+  invoiceDate: date("invoiceDate").notNull(),
+  dueDate: date("dueDate"),
+  laborCost: decimal("laborCost", { precision: 12, scale: 2 }).notNull(),
+  materialCost: decimal("materialCost", { precision: 12, scale: 2 }).default("0").notNull(),
+  taxRate: decimal("taxRate", { precision: 5, scale: 2 }).default("7").notNull(), // VAT percentage
+  taxAmount: decimal("taxAmount", { precision: 12, scale: 2 }).notNull(),
+  totalAmount: decimal("totalAmount", { precision: 12, scale: 2 }).notNull(),
+  paymentStatus: mysqlEnum("paymentStatus", ["unpaid", "partial", "paid"]).default("unpaid").notNull(),
+  paymentMethod: varchar("paymentMethod", { length: 100 }), // e.g., "Bank Transfer", "Cash"
+  paidAmount: decimal("paidAmount", { precision: 12, scale: 2 }).default("0").notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Invoice = typeof invoices.$inferSelect;
+export type InsertInvoice = typeof invoices.$inferInsert;
