@@ -468,11 +468,11 @@ export const appRouter = router({
     create: publicProcedure
       .input(z.object({
         poNumber: z.string(),
-        prId: z.number().optional(),
+        prId: z.coerce.number().optional(),
         supplierName: z.string(),
         supplierContact: z.string().optional(),
         itemDescription: z.string(),
-        quantity: z.number(),
+        quantity: z.coerce.number(),
         unitPrice: z.string(),
         totalAmount: z.string(),
         deliveryDate: z.string().optional(),
@@ -510,7 +510,7 @@ export const appRouter = router({
         requestedBy: z.string(),
         projectName: z.string(),
         itemDescription: z.string(),
-        quantity: z.number(),
+        quantity: z.coerce.number(),
         status: z.enum(["draft", "approved", "issued", "returned"]).optional(),
         approvedBy: z.string().optional(),
         notes: z.string().optional(),
@@ -584,7 +584,7 @@ export const appRouter = router({
     create: publicProcedure
       .input(z.object({
         fsrNumber: z.string(),
-        joId: z.number().optional(),
+        joId: z.coerce.number().optional(),
         technician: z.string(),
         workDate: z.string(),
         startTime: z.string().optional(),
@@ -629,7 +629,7 @@ export const appRouter = router({
         dlNumber: z.string(),
         projectName: z.string(),
         logDate: z.string(),
-        workersCount: z.number(),
+        workersCount: z.coerce.number(),
         equipmentUsed: z.string().optional(),
         workDone: z.string().optional(),
         obstacles: z.string().optional(),
@@ -706,7 +706,7 @@ export const appRouter = router({
     create: publicProcedure
       .input(z.object({
         doNumber: z.string(),
-        quoteId: z.number().optional(),
+        quoteId: z.coerce.number().optional(),
         customerName: z.string(),
         workDate: z.string(),
         workDescription: z.string(),
@@ -744,7 +744,7 @@ export const appRouter = router({
     create: publicProcedure
       .input(z.object({
         invoiceNumber: z.string(),
-        doId: z.number().optional(),
+        doId: z.coerce.number().optional(),
         customerName: z.string(),
         customerTaxId: z.string().optional(),
         customerAddress: z.string().optional(),
