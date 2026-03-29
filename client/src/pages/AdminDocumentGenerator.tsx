@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
+import DashboardLayout from "@/components/DashboardLayout";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,7 +29,7 @@ const DOCUMENT_TYPES = [
   { id: "invoice", label: "INV", name: "Invoice (ใบแจ้งหนี้)", category: "Finance & Closing" },
 ];
 
-export default function AdminDocumentGenerator() {
+function AdminDocumentGeneratorContent() {
   const [selectedType, setSelectedType] = useState<DocumentType>("pr");
   const [formData, setFormData] = useState<DocumentFormData>({
     documentType: "pr",
@@ -119,8 +121,39 @@ export default function AdminDocumentGenerator() {
     }
   };
 
+  const [, navigate] = useLocation();
+
   const handlePrintDocument = () => {
-    window.print();
+    const printWindow = window.open("", "", "height=600,width=800");
+    if (printWindow) {
+      const docType = DOCUMENT_TYPES.find(d => d.id === selectedType);
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>${docType?.name}</title>
+            <style>
+              body { font-family: Arial, sans-serif; margin: 20px; }
+              h1 { color: #333; }
+              .detail { margin: 10px 0; }
+              .label { font-weight: bold; color: #666; }
+            </style>
+          </head>
+          <body>
+            <h1>${docType?.name}</h1>
+            ${Object.entries(formData)
+              .filter(([key]) => key !== 'documentType')
+              .map(([key, value]) => `<div class="detail"><span class="label">${key}:</span> ${value}</div>`)
+              .join("")}
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.print();
+    }
+  };
+
+  const handleViewDocuments = () => {
+    navigate("/admin/documents-list");
   };
 
   const selectedDocType = DOCUMENT_TYPES.find(d => d.id === selectedType);
@@ -134,13 +167,9 @@ export default function AdminDocumentGenerator() {
           <p className="text-muted-foreground mt-2">สร้างและจัดการเอกสารทางธุรกิจ</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={handlePrintDocument}>
-            <Printer className="w-4 h-4 mr-2" />
-            พิมพ์
-          </Button>
-          <Button variant="outline" size="sm" disabled>
-            <Download className="w-4 h-4 mr-2" />
-            ส่งออก PDF
+          <Button variant="outline" size="sm" onClick={handleViewDocuments}>
+            <FileText className="w-4 h-4 mr-2" />
+            ดูประวัติ
           </Button>
         </div>
       </div>
@@ -519,6 +548,14 @@ export default function AdminDocumentGenerator() {
           </Button>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    );
+  }
+
+export default function AdminDocumentGenerator() {
+  return (
+    <DashboardLayout>
+      <AdminDocumentGeneratorContent />
+    </DashboardLayout>
   );
 }
