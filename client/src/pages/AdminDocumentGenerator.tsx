@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
-import DashboardLayout from "@/components/DashboardLayout";
+import AdminLayout from "@/components/AdminLayout";
 import { useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -554,8 +554,8 @@ function AdminDocumentGeneratorContent() {
 
 export default function AdminDocumentGenerator() {
   return (
-    <DashboardLayout>
+    <AdminLayout>
       <AdminDocumentGeneratorContent />
-    </DashboardLayout>
+    </AdminLayout>
   );
 }

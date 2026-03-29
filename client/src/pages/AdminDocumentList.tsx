@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { trpc } from "@/lib/trpc";
-import DashboardLayout from "@/components/DashboardLayout";
+import AdminLayout from "@/components/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -282,8 +282,8 @@ function DocumentListContent() {
 
 export default function AdminDocumentList() {
   return (
-    <DashboardLayout>
+    <AdminLayout>
       <DocumentListContent />
-    </DashboardLayout>
+    </AdminLayout>
   );
 }

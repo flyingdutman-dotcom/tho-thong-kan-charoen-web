@@ -293,3 +293,12 @@
 - [x] Tested document list navigation - SUCCESS
 - [x] Tested view details - SUCCESS
 - [x] All document types working with improved UI/UX
+
+
+## Document Generator Authentication Fix (Bug Fix)
+- [x] Changed AdminDocumentGenerator from DashboardLayout to AdminLayout
+- [x] Changed AdminDocumentList from DashboardLayout to AdminLayout
+- [x] Tested document generator with admin login (no Manus OAuth required) - SUCCESS
+- [x] Tested document list with admin login - SUCCESS
+- [x] Verified no redirect to Manus login page
+- [x] Both pages now work with admin login (username/password)
