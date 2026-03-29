@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +23,17 @@ export default function AdminDocumentGenerator() {
   });
   const [isGenerating, setIsGenerating] = useState(false);
 
+  // tRPC mutations for each document type
+  const prMutation = trpc.purchaseRequisitions.create.useMutation();
+  const poMutation = trpc.purchaseOrders.create.useMutation();
+  const srMutation = trpc.stockRequisitions.create.useMutation();
+  const joMutation = trpc.jobOrders.create.useMutation();
+  const fsrMutation = trpc.fieldServiceReports.create.useMutation();
+  const dlMutation = trpc.dailyLogs.create.useMutation();
+  const quotationMutation = trpc.quotations.create.useMutation();
+  const doMutation = trpc.deliveryOrders.create.useMutation();
+  const invoiceMutation = trpc.invoices.create.useMutation();
+
   const handleInputChange = (field: string, value: any) => {
     setFormData((prev) => ({
       ...prev,
@@ -32,10 +44,44 @@ export default function AdminDocumentGenerator() {
   const handleGenerateDocument = async () => {
     try {
       setIsGenerating(true);
-      // TODO: Call tRPC procedure to generate document
-      // TODO: Show success notification
+      
+      // Call appropriate tRPC mutation based on document type
+      switch (activeTab) {
+        case "pr":
+          await prMutation.mutateAsync(formData as any);
+          break;
+        case "po":
+          await poMutation.mutateAsync(formData as any);
+          break;
+        case "sr":
+          await srMutation.mutateAsync(formData as any);
+          break;
+        case "jo":
+          await joMutation.mutateAsync(formData as any);
+          break;
+        case "fsr":
+          await fsrMutation.mutateAsync(formData as any);
+          break;
+        case "dl":
+          await dlMutation.mutateAsync(formData as any);
+          break;
+        case "quotation":
+          await quotationMutation.mutateAsync(formData as any);
+          break;
+        case "do":
+          await doMutation.mutateAsync(formData as any);
+          break;
+        case "invoice":
+          await invoiceMutation.mutateAsync(formData as any);
+          break;
+      }
+      
+      // Reset form after successful creation
+      setFormData({ documentType: activeTab });
+      alert(`${activeTab.toUpperCase()} created successfully!`);
     } catch (error) {
-      // TODO: Show error notification
+      console.error("Error creating document:", error);
+      alert(`Failed to create document: ${error instanceof Error ? error.message : "Unknown error"}`);
     } finally {
       setIsGenerating(false);
     }
