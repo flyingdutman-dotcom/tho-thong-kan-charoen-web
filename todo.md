@@ -258,3 +258,10 @@
 - [x] Documents upload/download/delete works
 - [x] Stats page shows data
 - [x] All 24 vitest tests passing
+
+
+## Document Generator Final Fix
+- [x] Added parseFloat() conversion for number fields in AdminDocumentGenerator
+- [x] Convert quantity, workersCount, prId, joId, quoteId, doId, pipeLength, laborCost, materialCost, totalAmount, estimatedCost from strings to numbers
+- [x] Document creation now works for all 9 document types
+- [x] All 24 tests passing

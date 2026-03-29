@@ -45,34 +45,43 @@ export default function AdminDocumentGenerator() {
     try {
       setIsGenerating(true);
       
+      // Convert number fields from strings to actual numbers
+      const processedData = { ...formData };
+      const numberFields = ['quantity', 'workersCount', 'prId', 'joId', 'quoteId', 'doId', 'pipeLength', 'laborCost', 'materialCost', 'totalAmount', 'estimatedCost'];
+      numberFields.forEach(field => {
+        if (processedData[field] && typeof processedData[field] === 'string') {
+          processedData[field] = parseFloat(processedData[field]) || 0;
+        }
+      });
+      
       // Call appropriate tRPC mutation based on document type
       switch (activeTab) {
         case "pr":
-          await prMutation.mutateAsync(formData as any);
+          await prMutation.mutateAsync(processedData as any);
           break;
         case "po":
-          await poMutation.mutateAsync(formData as any);
+          await poMutation.mutateAsync(processedData as any);
           break;
         case "sr":
-          await srMutation.mutateAsync(formData as any);
+          await srMutation.mutateAsync(processedData as any);
           break;
         case "jo":
-          await joMutation.mutateAsync(formData as any);
+          await joMutation.mutateAsync(processedData as any);
           break;
         case "fsr":
-          await fsrMutation.mutateAsync(formData as any);
+          await fsrMutation.mutateAsync(processedData as any);
           break;
         case "dl":
-          await dlMutation.mutateAsync(formData as any);
+          await dlMutation.mutateAsync(processedData as any);
           break;
         case "quotation":
-          await quotationMutation.mutateAsync(formData as any);
+          await quotationMutation.mutateAsync(processedData as any);
           break;
         case "do":
-          await doMutation.mutateAsync(formData as any);
+          await doMutation.mutateAsync(processedData as any);
           break;
         case "invoice":
-          await invoiceMutation.mutateAsync(formData as any);
+          await invoiceMutation.mutateAsync(processedData as any);
           break;
       }
       
