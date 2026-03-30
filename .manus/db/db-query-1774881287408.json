@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE `delivery_orders` MODIFY COLUMN `quoteId` int DEFAULT null;\nALTER TABLE `field_service_reports` MODIFY COLUMN `joId` int DEFAULT null;\nALTER TABLE `invoices` MODIFY COLUMN `doId` int DEFAULT null;\nALTER TABLE `purchase_orders` MODIFY COLUMN `prId` int DEFAULT null;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user kt9spftQspDSvH2.root --database YRQeHhhSNikVjybho3gr2n --execute ALTER TABLE `delivery_orders` MODIFY COLUMN `quoteId` int DEFAULT null;\nALTER TABLE `field_service_reports` MODIFY COLUMN `joId` int DEFAULT null;\nALTER TABLE `invoices` MODIFY COLUMN `doId` int DEFAULT null;\nALTER TABLE `purchase_orders` MODIFY COLUMN `prId` int DEFAULT null;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 3438
+}

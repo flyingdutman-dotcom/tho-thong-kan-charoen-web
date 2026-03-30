@@ -320,3 +320,45 @@
 - [x] Used sed command to safely update all field validations in routers.ts
 - [x] Tested PR creation with fixed schema - SUCCESS
 - [x] All document types now working correctly with proper type conversion
+
+
+## Document Creation Error Debugging (In Progress)
+- [ ] Check database schema for all 9 document types
+- [ ] Check createPurchaseRequisition and other document functions in db.ts
+- [ ] Identify schema mismatch between form fields and database columns
+- [ ] Fix INSERT statement to match database schema
+- [ ] Test all 9 document types creation
+
+
+## Document Creation Testing & Fixes (In Progress)
+- [ ] Test PR (Purchase Requisition) creation
+- [ ] Test PO (Purchase Order) creation
+- [ ] Test SR (Stock Requisition) creation
+- [ ] Test JO (Job Order) creation
+- [ ] Test FSR (Field Service Report) creation
+- [ ] Test DL (Daily Log) creation
+- [ ] Test QT (Quotation) creation
+- [ ] Test DO (Delivery Order) creation
+- [ ] Test INV (Invoice) creation
+- [ ] Fix any errors found in document creation
+- [ ] Verify all 9 document types work correctly
+
+## Document List UI Improvements (In Progress)
+- [ ] Improve document list layout for better readability
+- [ ] Add better filtering and search functionality
+- [ ] Improve table/list display
+- [ ] Add document status indicators
+- [ ] Improve action buttons layout
+
+## Print Templates (In Progress)
+- [ ] Create beautiful print template for PR
+- [ ] Create beautiful print template for PO
+- [ ] Create beautiful print template for SR
+- [ ] Create beautiful print template for JO
+- [ ] Create beautiful print template for FSR
+- [ ] Create beautiful print template for DL
+- [ ] Create beautiful print template for QT
+- [ ] Create beautiful print template for DO
+- [ ] Create beautiful print template for INV
+- [ ] Add company branding to all print templates
+- [ ] Test print functionality for all document types

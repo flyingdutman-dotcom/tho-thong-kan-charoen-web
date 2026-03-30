@@ -62,6 +62,14 @@ function AdminDocumentGeneratorContent() {
     materialCost: "",
     totalAmount: "",
     unitPrice: "",
+    projectName: "",
+    jobDescription: "",
+    startDate: "",
+    endDate: "",
+    customerName: "",
+    customerPhone: "",
+    deliveryDate: "",
+    supplierContact: "",
   });
   const [isGenerating, setIsGenerating] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
@@ -382,13 +390,23 @@ function AdminDocumentGeneratorContent() {
                   <Input placeholder="JO-2026-001" value={formData.joNumber || ""} onChange={(e) => handleInputChange("joNumber", e.target.value)} />
                 </div>
                 <div>
+                  <Label>ชื่อลูกค้า</Label>
+                  <Input placeholder="ชื่อลูกค้า" value={formData.customerName || ""} onChange={(e) => handleInputChange("customerName", e.target.value)} />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>เบอร์โทร/อีเมล</Label>
+                  <Input placeholder="เบอร์โทร/อีเมล" value={formData.customerPhone || ""} onChange={(e) => handleInputChange("customerPhone", e.target.value)} />
+                </div>
+                <div>
                   <Label>ชื่อโครงการ</Label>
                   <Input placeholder="ชื่อโครงการ" value={formData.projectName || ""} onChange={(e) => handleInputChange("projectName", e.target.value)} />
                 </div>
               </div>
               <div>
                 <Label>รายละเอียดงาน</Label>
-                <Textarea placeholder="อธิบายงานที่ต้องทำ" value={formData.jobDescription || ""} onChange={(e) => handleInputChange("jobDescription", e.target.value)} />
+                <Textarea placeholder="อธิบายงานที่ต้องทำ" value={formData.workDescription || ""} onChange={(e) => handleInputChange("workDescription", e.target.value)} />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
