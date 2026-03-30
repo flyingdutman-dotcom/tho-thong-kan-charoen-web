@@ -33,6 +33,35 @@ function AdminDocumentGeneratorContent() {
   const [selectedType, setSelectedType] = useState<DocumentType>("pr");
   const [formData, setFormData] = useState<DocumentFormData>({
     documentType: "pr",
+    prNumber: "",
+    poNumber: "",
+    srNumber: "",
+    joNumber: "",
+    fsrNumber: "",
+    dlNumber: "",
+    quoteNumber: "",
+    doNumber: "",
+    invoiceNumber: "",
+    requestedBy: "",
+    supplierName: "",
+    itemDescription: "",
+    estimatedCost: "",
+    purpose: "",
+    notes: "",
+    workDescription: "",
+    status: "draft",
+    approvedBy: "",
+    quantity: "",
+    workersCount: "",
+    prId: "",
+    joId: "",
+    quoteId: "",
+    doId: "",
+    pipeLength: "",
+    laborCost: "",
+    materialCost: "",
+    totalAmount: "",
+    unitPrice: "",
   });
   const [isGenerating, setIsGenerating] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
@@ -75,6 +104,13 @@ function AdminDocumentGeneratorContent() {
       stringFields.forEach(field => {
         if (processedData[field] && typeof processedData[field] !== 'string') {
           processedData[field] = String(processedData[field]);
+        }
+      });
+      
+      // Ensure all undefined/null fields become empty strings
+      Object.keys(processedData).forEach(key => {
+        if (key !== 'documentType' && (processedData[key] === undefined || processedData[key] === null)) {
+          processedData[key] = '';
         }
       });
       
