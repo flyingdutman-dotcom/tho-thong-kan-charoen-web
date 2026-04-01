@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useAdmin } from "@/contexts/AdminContext";
 import { NotificationCenter } from "@/components/NotificationCenter";
-import { LogOut, Menu, X, LayoutDashboard, FileText, Image, BarChart3, Star, Calendar, File, FileCheck } from "lucide-react";
+import { LogOut, Menu, X, LayoutDashboard, FileText, Image, BarChart3, Star, Calendar, File, FileCheck, LineChart } from "lucide-react";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -51,6 +51,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { label: "รีวิว", icon: Star, href: "/admin/reviews" },
     { label: "การจอง", icon: Calendar, href: "/admin/bookings" },
     { label: "จัดการเอกสาร", icon: File, href: "/admin/documents-list" },
+    { label: "รายงานเอกสาร", icon: LineChart, href: "/admin/document-reports" },
     { label: "สถิติ", icon: BarChart3, href: "/admin/stats" },
   ];
 

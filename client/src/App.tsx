@@ -19,6 +19,7 @@ import AdminBookings from "./pages/AdminBookings";
 import AdminDocuments from "./pages/AdminDocuments";
 import AdminStats from "./pages/AdminStats";
 import AdminDocumentManagement from "./pages/AdminDocumentManagement";
+import AdminDocumentReports from "./pages/AdminDocumentReports";
 import AdminLogin from "./pages/AdminLogin";
 
 function Router() {
@@ -38,6 +39,7 @@ function Router() {
       <Route path="/admin/documents" component={AdminDocuments} />
       <Route path="/admin/document-generator" component={AdminDocumentManagement} />
       <Route path="/admin/documents-list" component={AdminDocumentManagement} />
+      <Route path="/admin/document-reports" component={AdminDocumentReports} />
       <Route path="/admin/stats" component={AdminStats} />
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/404" component={NotFound} />
