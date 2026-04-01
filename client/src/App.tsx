@@ -18,7 +18,8 @@ import AdminReviews from "./pages/AdminReviews";
 import AdminBookings from "./pages/AdminBookings";
 import AdminDocuments from "./pages/AdminDocuments";
 import AdminStats from "./pages/AdminStats";
-import AdminDocumentManagement from "./pages/AdminDocumentManagement";
+import AdminDocumentGenerator from "./pages/AdminDocumentGenerator";
+import AdminDocumentList from "./pages/AdminDocumentList";
 import AdminDocumentReports from "./pages/AdminDocumentReports";
 import AdminLogin from "./pages/AdminLogin";
 
@@ -37,8 +38,8 @@ function Router() {
       <Route path="/admin/reviews" component={AdminReviews} />
       <Route path="/admin/bookings" component={AdminBookings} />
       <Route path="/admin/documents" component={AdminDocuments} />
-      <Route path="/admin/document-generator" component={AdminDocumentManagement} />
-      <Route path="/admin/documents-list" component={AdminDocumentManagement} />
+      <Route path="/admin/document-generator" component={AdminDocumentGenerator} />
+      <Route path="/admin/documents-list" component={AdminDocumentList} />
       <Route path="/admin/document-reports" component={AdminDocumentReports} />
       <Route path="/admin/stats" component={AdminStats} />
       <Route path="/admin/login" component={AdminLogin} />

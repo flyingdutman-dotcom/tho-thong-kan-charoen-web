@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -50,93 +52,79 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { label: "ผลงาน", icon: Image, href: "/admin/portfolio" },
     { label: "รีวิว", icon: Star, href: "/admin/reviews" },
     { label: "การจอง", icon: Calendar, href: "/admin/bookings" },
-    { label: "จัดการเอกสาร", icon: File, href: "/admin/documents-list" },
+    { label: "จัดการเอกสาร", icon: FileCheck, href: "/admin/documents-list" },
     { label: "รายงานเอกสาร", icon: LineChart, href: "/admin/document-reports" },
-    { label: "สถิติ", icon: BarChart3, href: "/admin/stats" },
   ];
 
   return (
     <div className="flex h-screen bg-background">
       {/* Sidebar */}
-      <aside
+      <div
         className={`${
           sidebarOpen ? "w-64" : "w-20"
-        } bg-secondary text-white transition-all duration-300 flex flex-col border-r-4 border-primary`}
+        } bg-slate-900 text-white transition-all duration-300 flex flex-col border-r border-slate-700`}
       >
-        {/* Logo */}
-        <div className="p-4 border-b border-white/20 flex items-center justify-between">
-          <div className={`flex items-center gap-3 ${!sidebarOpen && "justify-center w-full"}`}>
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold">ท</span>
-            </div>
-            {sidebarOpen && <span className="font-bold text-lg">Admin</span>}
+        {/* Logo/Brand */}
+        <div className="p-4 border-b border-slate-700 flex items-center justify-between">
+          <div className={`${!sidebarOpen && "hidden"} font-bold text-lg`}>
+            ท่อทองการเจริญ
           </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="text-white hover:bg-slate-800"
+          >
+            {sidebarOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+          </Button>
         </div>
 
-        {/* Menu Items */}
-        <nav className="flex-1 p-4 space-y-2">
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto p-4 space-y-2">
           {menuItems.map((item) => (
-            <button
+            <Button
               key={item.href}
+              variant="ghost"
+              className="w-full justify-start text-white hover:bg-slate-800"
               onClick={() => navigate(item.href)}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 transition-colors text-left"
               title={item.label}
             >
-              <item.icon className="w-5 h-5 flex-shrink-0" />
-              {sidebarOpen && <span>{item.label}</span>}
-            </button>
+              <item.icon className="w-5 h-5" />
+              {sidebarOpen && <span className="ml-3">{item.label}</span>}
+            </Button>
           ))}
         </nav>
 
-        {/* User Info & Logout */}
-        <div className="p-4 border-t border-white/20 space-y-2">
-          {sidebarOpen && (
-            <div className="text-sm text-white/80 px-2">
-              <p className="font-semibold">{adminName}</p>
-              <p className="text-xs text-white/60">{adminEmail}</p>
-            </div>
-          )}
+        {/* User Profile */}
+        <div className="p-4 border-t border-slate-700 space-y-2">
+          <div className={`${!sidebarOpen && "hidden"} text-sm`}>
+            <p className="font-semibold truncate">{adminName}</p>
+            <p className="text-slate-400 text-xs truncate">{adminEmail}</p>
+          </div>
           <Button
+            variant="destructive"
+            className="w-full justify-start"
             onClick={handleLogout}
-            variant="ghost"
-            className="w-full text-white hover:bg-white/10 gap-2 justify-start"
           >
-            <LogOut className="w-5 h-5" />
-            {sidebarOpen && "ออกจากระบบ"}
+            <LogOut className="w-4 h-4" />
+            {sidebarOpen && <span className="ml-2">ออกจากระบบ</span>}
           </Button>
         </div>
-
-        {/* Toggle Sidebar */}
-        <div className="p-2 border-t border-white/20">
-          <Button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            variant="ghost"
-            size="sm"
-            className="w-full text-white hover:bg-white/10"
-          >
-            {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </Button>
-        </div>
-      </aside>
+      </div>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto">
+      <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top Bar */}
-        <div className="bg-white border-b-4 border-primary sticky top-0 z-40 p-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-secondary">บริษัท ท่อทองการเจริญ - ระบบแอดมิน</h1>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-muted-foreground">ยินดีต้อนรับ, {adminName}</span>
-              <NotificationCenter />
-            </div>
-          </div>
+        <div className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-slate-900">Admin Panel</h1>
+          <NotificationCenter />
         </div>
 
-        {/* Content */}
-        <div className="p-6">
+        {/* Content Area */}
+        <div className="flex-1 overflow-auto p-6">
           {children}
         </div>
-      </main>
+      </div>
     </div>
   );
 }
