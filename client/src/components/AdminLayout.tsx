@@ -50,8 +50,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { label: "ผลงาน", icon: Image, href: "/admin/portfolio" },
     { label: "รีวิว", icon: Star, href: "/admin/reviews" },
     { label: "การจอง", icon: Calendar, href: "/admin/bookings" },
-    { label: "เอกสาร", icon: File, href: "/admin/documents" },
-    { label: "สร้างเอกสาร", icon: FileCheck, href: "/admin/document-generator" },
+    { label: "จัดการเอกสาร", icon: File, href: "/admin/documents-list" },
     { label: "สถิติ", icon: BarChart3, href: "/admin/stats" },
   ];
 
