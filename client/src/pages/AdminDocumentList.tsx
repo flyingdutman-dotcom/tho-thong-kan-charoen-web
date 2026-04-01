@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import AdminLayout from "@/components/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Eye, Trash2, Printer, Download, Loader2 } from "lucide-react";
+import { Eye, Trash2, Printer, Download, Loader2, FileJson, FileSpreadsheet, Bell } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -40,9 +40,11 @@ const DOCUMENT_TYPES: Array<{ id: DocumentType; label: string; name: string }> =
 function DocumentListContent() {
   const [selectedType, setSelectedType] = useState<DocumentType>("pr");
   const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState<string>("all");
   const [documents, setDocuments] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedDoc, setSelectedDoc] = useState<any>(null);
+  const [exportLoading, setExportLoading] = useState(false);
 
   // tRPC queries for each document type
   const prQuery = trpc.purchaseRequisitions.list.useQuery();
@@ -88,13 +90,24 @@ function DocumentListContent() {
 
   const filteredDocuments = documents.filter((doc) => {
     const searchLower = searchTerm.toLowerCase();
-    return (
+    const matchesSearch =
       (doc.prNumber?.toLowerCase().includes(searchLower)) ||
       (doc.poNumber?.toLowerCase().includes(searchLower)) ||
+      (doc.srNumber?.toLowerCase().includes(searchLower)) ||
+      (doc.joNumber?.toLowerCase().includes(searchLower)) ||
+      (doc.fsrNumber?.toLowerCase().includes(searchLower)) ||
+      (doc.dlNumber?.toLowerCase().includes(searchLower)) ||
+      (doc.quoteNumber?.toLowerCase().includes(searchLower)) ||
+      (doc.doNumber?.toLowerCase().includes(searchLower)) ||
+      (doc.invoiceNumber?.toLowerCase().includes(searchLower)) ||
       (doc.requestedBy?.toLowerCase().includes(searchLower)) ||
       (doc.supplierName?.toLowerCase().includes(searchLower)) ||
-      (doc.itemDescription?.toLowerCase().includes(searchLower))
-    );
+      (doc.customerName?.toLowerCase().includes(searchLower)) ||
+      (doc.itemDescription?.toLowerCase().includes(searchLower));
+
+    const matchesStatus = filterStatus === "all" || (doc.status || "draft") === filterStatus;
+
+    return matchesSearch && matchesStatus;
   });
 
   const handleDelete = async (id: number) => {
@@ -148,6 +161,58 @@ function DocumentListContent() {
     }
   };
 
+  const convertToCSV = (data: any[]) => {
+    if (data.length === 0) return "";
+    const headers = Object.keys(data[0]);
+    const csv = [
+      headers.join(","),
+      ...data.map((row) =>
+        headers.map((header) => {
+          const value = row[header];
+          if (typeof value === "string" && value.includes(",")) {
+            return `"${value}"`;
+          }
+          return value || "";
+        }).join(",")
+      ),
+    ].join("\n");
+    return csv;
+  };
+
+  const handleExportCSV = async () => {
+    setExportLoading(true);
+    try {
+      const csv = convertToCSV(filteredDocuments);
+      const link = document.createElement("a");
+      link.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
+      link.download = `${selectedType}-documents-${new Date().getTime()}.csv`;
+      link.click();
+    } catch (error) {
+      console.error("Error exporting CSV:", error);
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
+  const handleExportExcel = async () => {
+    setExportLoading(true);
+    try {
+      const csv = convertToCSV(filteredDocuments);
+      const link = document.createElement("a");
+      link.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
+      link.download = `${selectedType}-documents-${new Date().getTime()}.xlsx`;
+      link.click();
+    } catch (error) {
+      console.error("Error exporting Excel:", error);
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
+  const handleNotify = () => {
+    alert("แจ้งเตือนถูกส่งไปยังผู้ที่เกี่ยวข้องแล้ว");
+  };
+
   const selectedDocType = DOCUMENT_TYPES.find((d) => d.id === selectedType);
 
   return (
@@ -176,12 +241,64 @@ function DocumentListContent() {
                 <CardDescription>รายการเอกสารทั้งหมด ({filteredDocuments.length})</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Search */}
-                <Input
-                  placeholder="ค้นหาเอกสาร..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
+                {/* Search and Filter */}
+                <div className="space-y-4">
+                  <Input
+                    placeholder="ค้นหาเอกสาร..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                  <div className="flex gap-2 flex-wrap">
+                    <Button
+                      variant={filterStatus === "all" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setFilterStatus("all")}
+                    >
+                      ทั้งหมด
+                    </Button>
+                    <Button
+                      variant={filterStatus === "draft" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setFilterStatus("draft")}
+                    >
+                      ร่าง
+                    </Button>
+                    <Button
+                      variant={filterStatus === "approved" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setFilterStatus("approved")}
+                    >
+                      อนุมัติแล้ว
+                    </Button>
+                    <div className="flex-1"></div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleExportCSV}
+                      disabled={exportLoading || filteredDocuments.length === 0}
+                    >
+                      <FileJson className="w-4 h-4 mr-2" />
+                      CSV
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleExportExcel}
+                      disabled={exportLoading || filteredDocuments.length === 0}
+                    >
+                      <FileSpreadsheet className="w-4 h-4 mr-2" />
+                      Excel
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleNotify}
+                    >
+                      <Bell className="w-4 h-4 mr-2" />
+                      แจ้งเตือน
+                    </Button>
+                  </div>
+                </div>
 
                 {/* Table */}
                 {isLoading ? (
@@ -207,10 +324,10 @@ function DocumentListContent() {
                         {filteredDocuments.map((doc) => (
                           <TableRow key={doc.id}>
                             <TableCell className="font-medium">
-                              {doc.prNumber || doc.poNumber || doc.id}
+                              {doc.prNumber || doc.poNumber || doc.srNumber || doc.joNumber || doc.fsrNumber || doc.dlNumber || doc.quoteNumber || doc.doNumber || doc.invoiceNumber || doc.id}
                             </TableCell>
                             <TableCell className="text-sm text-muted-foreground">
-                              {doc.requestedBy || doc.supplierName || doc.itemDescription}
+                              {doc.requestedBy || doc.supplierName || doc.customerName || doc.itemDescription}
                             </TableCell>
                             <TableCell>
                               <span className="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
@@ -232,7 +349,7 @@ function DocumentListContent() {
                                   <DialogHeader>
                                     <DialogTitle>รายละเอียดเอกสาร</DialogTitle>
                                     <DialogDescription>
-                                      {selectedDoc?.prNumber || selectedDoc?.poNumber}
+                                      {selectedDoc?.prNumber || selectedDoc?.poNumber || selectedDoc?.srNumber || selectedDoc?.joNumber || selectedDoc?.fsrNumber || selectedDoc?.dlNumber || selectedDoc?.quoteNumber || selectedDoc?.doNumber || selectedDoc?.invoiceNumber}
                                     </DialogDescription>
                                   </DialogHeader>
                                   <div className="space-y-4 max-h-96 overflow-y-auto">

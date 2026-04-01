@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useAdmin } from "@/contexts/AdminContext";
+import { NotificationCenter } from "@/components/NotificationCenter";
 import { LogOut, Menu, X, LayoutDashboard, FileText, Image, BarChart3, Star, Calendar, File, FileCheck } from "lucide-react";
 
 interface AdminLayoutProps {
@@ -126,6 +127,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             <h1 className="text-2xl font-bold text-secondary">บริษัท ท่อทองการเจริญ - ระบบแอดมิน</h1>
             <div className="flex items-center gap-4">
               <span className="text-sm text-muted-foreground">ยินดีต้อนรับ, {adminName}</span>
+              <NotificationCenter />
             </div>
           </div>
         </div>
